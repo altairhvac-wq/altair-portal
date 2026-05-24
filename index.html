@@ -645,12 +645,49 @@
             btn.classList.add('cursor-not-allowed', 'opacity-70');
 
             if (status === 'Completed') {
-                const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
-                let partsUsed = [];
-                document.querySelectorAll('.closeout-part-item').forEach(row => {
-                    const name = row.querySelector('.part-name').value;
-                    const qty = parseInt(row.querySelector('.part-qty').value) || 0;
-                    if (name && qty > 0) partsUsed.push({ name, qty });
+                // ... existing job update code ...
+const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
+if(error) { alert("Error: " + error.message); return; }
+
+btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
+btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg flex justify-center items-center";
+
+// Trigger the invoice and inventory deduction engine
+await generateLiveInvoice(
+if (partsUsed.length > 0) {
+    for (const part of partsUsed) {
+        const { data: currentItem } = await db
+            .from('inventory')
+            .select('id, stock_qty')
+            .eq('company_id', COMPANY_ID)
+            .ilike('part_name', part.name)
+            .single();
+
+        if (currentItem) {
+            // Strictly enforce direct subtraction from the quantity column
+            const newQty = currentItem.stock_qty - part.qty;
+            await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
+        }
+    }
+});
+                // Inside generateLiveInvoice()
+
+}
+
+// Enterprise UX: Explicit confirmation checkmark state before closing
+btn.innerHTML = `
+    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    Job Closed Successfully
+`;
+btn.classList.replace('bg-emerald-500', 'bg-green-600');
+
+// Hold the success state for 1.5s so the tech can register it, then refresh
+setTimeout(() => { 
+    closeJobModal(); 
+    fetchLiveAppEngineData(); 
+}, 1500);
                 });
 
                 const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
@@ -942,63 +979,73 @@
         // ==========================================
         // INVOICE & BILLING ENGINE
         // ==========================================
-        window.fetchInvoicesData = async function() {
-            const feed = document.getElementById('invoices-feed');
-            feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
+       window.fetchInvoicesData = async function() {
+    const feed = document.getElementById('invoices-feed');
+    feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
 
-            const { data: invoices, error } = await db
-                .from('invoices')
-                .select('*, jobs(name)')
-                .eq('company_id', COMPANY_ID)
-                .order('created_at', { ascending: false });
+    // Explicitly define the join to prevent PostgREST errors
+    const { data: invoices, error } = await db
+        .from('invoices')
+        .select(`
+            id, amount, status, created_at,
+            jobs ( name )
+        `)
+        .eq('company_id', COMPANY_ID)
+        .order('created_at', { ascending: false });
 
-            if (error) { 
-                feed.innerHTML = `<p class="text-red-500 text-center py-8">Error: ${error.message}</p>`; 
-                return; 
-            }
+    if (error) { 
+        console.error("Billing Sync Error:", error);
+        feed.innerHTML = `<p class="text-red-500 text-center py-8">Connection error. Check console.</p>`; 
+        return; 
+    }
 
-            let unpaidTotal = 0;
-            let paidTotal = 0;
-            let html = '';
+    let unpaidTotal = 0;
+    let paidTotal = 0;
+    let html = '';
 
-            if (!invoices || invoices.length === 0) {
-                html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
-            } else {
-                invoices.forEach(inv => {
-                    const amount = parseFloat(inv.amount) || 0;
-                    const jobName = inv.jobs ? inv.jobs.name : 'Service Call'; 
-                    const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (!invoices || invoices.length === 0) {
+        html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
+    } else {
+        invoices.forEach(inv => {
+            const amount = parseFloat(inv.amount) || 0;
+            
+            // Defensive check: Handle cases where jobs relationship returns null or an array
+            let jobName = 'Service Call';
+            if (inv.jobs && !Array.isArray(inv.jobs)) jobName = inv.jobs.name;
+            else if (Array.isArray(inv.jobs) && inv.jobs.length > 0) jobName = inv.jobs[0].name;
 
-                    if (inv.status === 'Unpaid') unpaidTotal += amount;
-                    if (inv.status === 'Paid') paidTotal += amount;
+            const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-                    const isPaid = inv.status === 'Paid';
-                    const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
-                    const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
-                    
-                    const actionBtn = isPaid 
-                        ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
-                        : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">Mark Paid</button>`;
+            if (inv.status === 'Unpaid') unpaidTotal += amount;
+            if (inv.status === 'Paid') paidTotal += amount;
 
-                    html += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex justify-between items-center transition hover:shadow-md">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
-                            <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
-                            <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
-                        </div>
-                        <div class="text-right flex flex-col items-end justify-between h-full">
-                            <span class="text-2xl font-black text-slate-800 mb-2">$${amount.toFixed(2)}</span>
-                            ${actionBtn}
-                        </div>
-                    </div>`;
-                });
-            }
+            const isPaid = inv.status === 'Paid';
+            const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
+            const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
+            
+            const actionBtn = isPaid 
+                ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
+                : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">Mark Paid</button>`;
 
-            document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
-            document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
-            feed.innerHTML = html;
-        };
+            html += `
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex justify-between items-center transition hover:shadow-md">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
+                    <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
+                    <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
+                </div>
+                <div class="text-right flex flex-col items-end justify-between h-full">
+                    <span class="text-2xl font-black text-slate-800 mb-2">$${amount.toFixed(2)}</span>
+                    ${actionBtn}
+                </div>
+            </div>`;
+        });
+    }
+
+    document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
+    document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
+    feed.innerHTML = html;
+}; 
 
         window.markAsPaid = async function(invoiceId) {
             const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
