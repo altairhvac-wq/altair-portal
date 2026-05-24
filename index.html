@@ -685,10 +685,25 @@
             btn.classList.add('cursor-not-allowed', 'opacity-70');
 
             if (status === 'Completed') {
+                // 1. GATHER CLOSEOUT DATA
+                const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
+                let partsUsed = [];
+                document.querySelectorAll('.closeout-part-item').forEach(row => {
+                    const name = row.querySelector('.part-name').value;
+                    const qty = parseInt(row.querySelector('.part-qty').value) || 0;
+                    if (name && qty > 0) partsUsed.push({ name, qty });
+                });
+
+                // 2. UPDATE JOB STATUS IN SUPABASE
                 const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
-                btn.innerHTML = `Invoice Engine Triggered!`;
+                
+                btn.innerHTML = `Generating Invoice...`;
                 btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
+                
+                // 3. FIRE THE LIVE INVOICE ENGINE
+                await generateLiveInvoice(jobId, hours, partsUsed);
+
                 setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
             } else {
                 const { error } = await db.from('jobs').update({ status: status }).eq('id', jobId);
@@ -698,6 +713,8 @@
                 setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
             }
         }
+
+        
 
         // ==========================================
         // CLIENT PROFILE ENGINE
