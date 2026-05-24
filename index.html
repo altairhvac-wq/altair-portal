@@ -691,76 +691,127 @@
         // ==========================================
         // ESTIMATE ENGINE (Needs Supabase logic next)
         // ==========================================
-        function openEstimateModal() { 
-            const m = document.getElementById('estimate-modal');
-            m.style.display = 'flex'; 
-            document.getElementById('est-line-items').innerHTML = '';
-            addLineItem();
-            
-            // Populate dummy dropdown for now
-            const select = document.getElementById('est-customer-select');
-            let options = '<option value="">-- Choose a Customer --</option>';
-            globalCustomerDirectory.forEach(cust => {
-                options += `<option value="${cust.id}">${cust.name}</option>`;
-            });
-            select.innerHTML = options;
-        }
-
-        function closeEstimateModal() {
-            const m = document.getElementById('estimate-modal');
-            m.style.display = 'none'; 
-            
-            document.getElementById('btn-submit-est').innerText = 'Save to Dispatch Board';
-            document.getElementById('btn-submit-est').className = "w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg";
-            document.getElementById('est-total-display').innerText = "0.00";
-            document.getElementById('est-line-items').innerHTML = '';
-        }
-
-        function addLineItem() {
-            const container = document.getElementById('est-line-items');
-            const row = document.createElement('div');
-            row.className = "flex space-x-2 items-center line-item";
-            row.innerHTML = `
-                <input type="text" placeholder="Item Name" class="w-1/2 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none bg-white">
-                <input type="number" placeholder="Qty" value="1" min="1" oninput="calculateEstTotal()" class="w-1/6 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-qty">
-                <input type="number" placeholder="Price" value="0.00" oninput="calculateEstTotal()" class="w-1/4 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-price">
-                <button onclick="removeLineItem(this)" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-lg">✖</button>
-            `;
-            container.appendChild(row);
-        }
-
-        function removeLineItem(btn) {
-            btn.parentElement.remove();
-            calculateEstTotal();
-        }
-
-        function calculateEstTotal() {
-            let total = 0;
-            document.querySelectorAll('.line-item').forEach(row => {
-                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                total += (qty * price);
-            });
-            document.getElementById('est-total-display').innerText = total.toFixed(2);
-        }
-
-        function submitEstimate() {
-            alert("Estimate saving to Supabase coming in next phase!");
-            closeEstimateModal();
-        }
-
         // ==========================================
-        // INVOICES ENGINE (Needs Supabase logic next)
-        // ==========================================
-        window.fetchInvoicesData = function() {
-            const feed = document.getElementById('invoices-feed');
-            feed.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">Invoice fetch logic migrating to Supabase...</div>';
-        };
+    // ESTIMATE ENGINE (SUPABASE)
+    // ==========================================
+    async function fetchPriceBook() {
+        const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
+        if (!error) globalPriceBook = data;
+    }
 
-        window.markAsPaid = function(row) {
-             alert("Billing updates moving to Supabase!");
-        };
+    function openEstimateModal() { 
+        const m = document.getElementById('estimate-modal');
+        m.style.display = 'flex'; 
+        document.getElementById('est-line-items').innerHTML = '';
+        
+        // 1. Populate the Customer Dropdown
+        const select = document.getElementById('est-customer-select');
+        let options = '-- Choose a Customer --';
+        globalCustomerDirectory.forEach(cust => {
+            options += `${cust.name}`;
+        });
+        select.innerHTML = options;
 
+        // 2. Add the first blank line item
+        addLineItem();
+    }
+
+    function closeEstimateModal() {
+        document.getElementById('estimate-modal').style.display = 'none'; 
+        document.getElementById('btn-submit-est').innerText = 'Save to Dispatch Board';
+        document.getElementById('btn-submit-est').className = "w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg";
+        document.getElementById('est-total-display').innerText = "0.00";
+        document.getElementById('est-line-items').innerHTML = '';
+    }
+
+    function addLineItem() {
+        const container = document.getElementById('est-line-items');
+        const row = document.createElement('div');
+        row.className = "flex space-x-2 items-center line-item";
+        
+        // Build dropdown from Price Book
+        let pbOptions = '-- Select Item --';
+        globalPriceBook.forEach(item => {
+            pbOptions += `${item.name}`;
+        });
+
+        row.innerHTML = `
+            
+                ${pbOptions}
+            
+            
+            
+            ✖
+        `;
+        container.appendChild(row);
+    }
+
+    function autoFillPrice(selectElem) {
+        const selectedOption = selectElem.options[selectElem.selectedIndex];
+        const price = selectedOption.getAttribute('data-price');
+        const priceInput = selectElem.parentElement.querySelector('.item-price');
+        priceInput.value = parseFloat(price).toFixed(2);
+        calculateEstTotal(); 
+    }
+
+    function removeLineItem(btn) {
+        btn.parentElement.remove();
+        calculateEstTotal();
+    }
+
+    function calculateEstTotal() {
+        let total = 0;
+        document.querySelectorAll('.line-item').forEach(row => {
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            total += (qty * price);
+        });
+        document.getElementById('est-total-display').innerText = total.toFixed(2);
+    }
+
+    async function submitEstimate() {
+        const select = document.getElementById('est-customer-select');
+        if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
+        
+        const custID = select.options[select.selectedIndex].value;
+        const amount = document.getElementById('est-total-display').innerText;
+        const btn = document.getElementById('btn-submit-est');
+
+        if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
+
+        btn.innerText = "Saving to Database...";
+        btn.classList.replace('bg-cyan-500', 'bg-slate-400');
+        btn.classList.add('cursor-not-allowed');
+
+        // Package the line items as JSON
+        let lineItems = [];
+        document.querySelectorAll('.line-item').forEach(row => {
+            const nameElem = row.querySelector('.item-name');
+            const name = nameElem.options[nameElem.selectedIndex].text;
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            if (name && qty > 0) lineItems.push({ name, qty, price });
+        });
+
+        const { error } = await db.from('estimates').insert([{ 
+            company_id: COMPANY_ID, 
+            customer_id: custID, 
+            title: 'Service Estimate', 
+            amount: amount,
+            line_items: lineItems 
+        }]);
+
+        if (error) {
+            alert("Error: " + error.message);
+            btn.innerText = "Save to Dispatch Board";
+            btn.classList.replace('bg-slate-400', 'bg-cyan-500');
+            btn.classList.remove('cursor-not-allowed');
+        } else {
+            btn.innerText = "Estimate Saved!";
+            btn.classList.replace('bg-slate-400', 'bg-green-500');
+            setTimeout(closeEstimateModal, 1500);
+        }
+    }
         // ==========================================
         // INITIALIZATION
         // ==========================================
