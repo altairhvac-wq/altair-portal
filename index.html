@@ -387,22 +387,96 @@
         }
 
         // ==========================================
-        // PDF INVOICE ENGINE TEST
+        // ALTAIR INVOICE ENGINE 
         // ==========================================
         window.testPDFEngine = function() {
+            // We will eventually pass real data into this function
             const docDefinition = {
                 content: [
-                    { text: 'ALTAIR Climate Control', style: 'header' },
-                    'Invoice Engine successfully mounted. Ready for live database injection.'
-                ],
-                styles: {
-                    header: {
-                        fontSize: 24,
-                        bold: true,
-                        margin: [0, 0, 0, 10]
+                    // 1. Header Row
+                    {
+                        columns: [
+                            { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
+                            { text: 'INVOICE\n# INV-0001', style: 'invoiceTitle', alignment: 'right' }
+                        ]
+                    },
+                    // Cyan Divider Line
+                    { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] }, 
+
+                    // 2. Company & Client Info Row
+                    {
+                        columns: [
+                            {
+                                text: [
+                                    { text: 'From:\n', bold: true, color: '#64748b' },
+                                    'ALTAIR Climate Control\nLayton, UT'
+                                ]
+                            },
+                            {
+                                text: [
+                                    { text: 'Bill To:\n', bold: true, color: '#64748b' },
+                                    'Client Name\n123 Service Address\nCity, UT'
+                                ],
+                                alignment: 'right'
+                            }
+                        ],
+                        margin: [0, 0, 0, 30] // Adds space below this section
+                    },
+
+                    // 3. Line Items Table
+                    {
+                        style: 'invoiceTable',
+                        table: {
+                            headerRows: 1,
+                            widths: ['*', 'auto', 'auto', 'auto'], // '*' means "take up remaining space"
+                            body: [
+                                // Table Header
+                                [
+                                    { text: 'Description', style: 'tableHeader' },
+                                    { text: 'Qty', style: 'tableHeader', alignment: 'center' },
+                                    { text: 'Price', style: 'tableHeader', alignment: 'right' },
+                                    { text: 'Total', style: 'tableHeader', alignment: 'right' }
+                                ],
+                                // Hardcoded sample data (we will automate this next)
+                                ['Diagnostic Fee', { text: '1', alignment: 'center' }, { text: '$89.00', alignment: 'right' }, { text: '$89.00', alignment: 'right' }],
+                                ['Capacitor Replacement', { text: '1', alignment: 'center' }, { text: '$185.00', alignment: 'right' }, { text: '$185.00', alignment: 'right' }],
+                                ['Labor (Hours)', { text: '1.5', alignment: 'center' }, { text: '$120.00', alignment: 'right' }, { text: '$180.00', alignment: 'right' }]
+                            ]
+                        },
+                        layout: 'lightHorizontalLines' // Gives it a clean, modern look
+                    },
+
+                    // 4. Totals Area
+                    {
+                        columns: [
+                            { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
+                            {
+                                table: {
+                                    widths: ['*', 'auto'],
+                                    body: [
+                                        ['Total Due:', { text: '$454.00', bold: true, fontSize: 16 }]
+                                    ]
+                                },
+                                layout: 'noBorders',
+                                alignment: 'right',
+                                margin: [0, 20, 0, 0]
+                            }
+                        ]
                     }
+                ],
+                // 5. Design Styles
+                styles: {
+                    brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
+                    invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
+                    tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
+                    invoiceTable: { margin: [0, 5, 0, 15] }
+                },
+                defaultStyle: {
+                    columnGap: 20
                 }
             };
+
+            // Generate it!
             pdfMake.createPdf(docDefinition).open();
         };
 
