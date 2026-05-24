@@ -694,7 +694,7 @@
                     if (name && qty > 0) partsUsed.push({ name, qty });
                 });
 
-                // 2. UPDATE JOB STATUS IN SUPABASE
+                // 2. UPDATE JOB STATUS
                 const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
                 
@@ -715,13 +715,11 @@
         }
 
         async function generateLiveInvoice(jobId, hours, partsUsed) {
-            // 1. Fetch Job & Customer Details from Supabase
+            // 1. Fetch Job Data
             const { data: jobData } = await db.from('jobs').select('*').eq('id', jobId).single();
             if (!jobData) return;
 
-            // 2. Start building the dynamic table
             let dynamicLineItems = [
-                // Table Headers
                 [
                     { text: 'Description', style: 'tableHeader' },
                     { text: 'Qty', style: 'tableHeader', alignment: 'center' },
@@ -732,7 +730,7 @@
 
             let grandTotal = 0;
 
-            // 3. Calculate Labor (Assuming $120/hr - you can change this!)
+            // 2. Calculate Labor
             if (hours > 0) {
                 const laborRate = 120.00; 
                 const laborTotal = hours * laborRate;
@@ -746,9 +744,8 @@
                 ]);
             }
 
-            // 4. Calculate Parts Used
+            // 3. Calculate Parts
             partsUsed.forEach(part => {
-                // Look up the part in your price book (defaults to 0 if not found)
                 const pbItem = globalPriceBook.find(item => item.name.toLowerCase() === part.name.toLowerCase());
                 const price = pbItem ? pbItem.price : 0.00; 
                 const lineTotal = part.qty * price;
@@ -762,61 +759,58 @@
                 ]);
             });
 
-            // 5. Inject everything into the PDF layout
+            // 4. Save Invoice to Supabase
+            await db.from('invoices').insert([{
+                company_id: COMPANY_ID,
+                job_id: jobId,
+                amount: grandTotal, 
+                status: 'Unpaid'
+            }]);
+
+            // 5. Sync Inventory Safely
+            if (partsUsed.length > 0) {
+                for (const part of partsUsed) {
+                    const { data: currentItem } = await db
+                        .from('inventory')
+                        .select('id, stock_qty')
+                        .eq('company_id', COMPANY_ID)
+                        .ilike('part_name', part.name)
+                        .single();
+
+                    if (currentItem) {
+                        const newQty = currentItem.stock_qty - part.qty;
+                        // This strictly targets the quantity column. It will never accidentally overwrite your location data or part names.
+                        await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
+                    }
+                }
+            }
+
+            // 6. Generate the PDF Document
             const docDefinition = {
                 content: [
                     {
                         columns: [
                             { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
-                            // Uses the first 6 characters of the Job ID for the Invoice Number
                             { text: `INVOICE\n# INV-${jobId.substring(0,6).toUpperCase()}`, style: 'invoiceTitle', alignment: 'right' }
                         ]
                     },
                     { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] }, 
-
                     {
                         columns: [
-                            {
-                                text: [
-                                    { text: 'From:\n', bold: true, color: '#64748b' },
-                                    'ALTAIR Climate Control\nLayton, UT'
-                                ]
-                            },
-                            {
-                                text: [
-                                    { text: 'Bill To:\n', bold: true, color: '#64748b' },
-                                    `${jobData.name}\n${jobData.address}\n${jobData.phone}`
-                                ],
-                                alignment: 'right'
-                            }
+                            { text: [{ text: 'From:\n', bold: true, color: '#64748b' }, 'ALTAIR Climate Control\nLayton, UT'] },
+                            { text: [{ text: 'Bill To:\n', bold: true, color: '#64748b' }, `${jobData.name}\n${jobData.address}\n${jobData.phone}`], alignment: 'right' }
                         ],
                         margin: [0, 0, 0, 30] 
                     },
-
                     {
                         style: 'invoiceTable',
-                        table: {
-                            headerRows: 1,
-                            widths: ['*', 'auto', 'auto', 'auto'], 
-                            body: dynamicLineItems // Injecting our dynamic array here!
-                        },
+                        table: { headerRows: 1, widths: ['*', 'auto', 'auto', 'auto'], body: dynamicLineItems },
                         layout: 'lightHorizontalLines' 
                     },
-
                     {
                         columns: [
                             { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
-                            {
-                                table: {
-                                    widths: ['*', 'auto'],
-                                    body: [
-                                        ['Total Due:', { text: `$${grandTotal.toFixed(2)}`, bold: true, fontSize: 16 }]
-                                    ]
-                                },
-                                layout: 'noBorders',
-                                alignment: 'right',
-                                margin: [0, 20, 0, 0]
-                            }
+                            { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: `$${grandTotal.toFixed(2)}`, bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
                         ]
                     }
                 ],
