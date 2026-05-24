@@ -64,7 +64,6 @@
             <div class="flex items-center space-x-4">
                 <span id="currentDate" class="text-sm font-semibold text-slate-400"></span>
                 <button onclick="openEstimateModal()" class="px-4 py-2 text-cyan-500 font-bold text-sm border-2 border-cyan-500 rounded-full hover:bg-cyan-50 transition shadow-sm">ADD ESTIMATE</button>
-                <button class="px-4 py-2 bg-cyan-500 text-white font-bold text-sm rounded-full shadow hover:bg-cyan-600 transition">PRESENT</button>
             </div>
         </header>
 
@@ -123,28 +122,9 @@
                 </div>
             </section>
 
-            <section id="view-estimates" class="app-section max-w-3xl mx-auto space-y-4">
-                <div class="bg-white border-2 border-cyan-500 rounded-lg p-5 shadow-md relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <div class="flex items-center space-x-2 mb-1">
-                                <span class="text-xs text-slate-400 font-medium">Recommend</span>
-                                <div class="w-6 h-6 bg-cyan-500 rounded flex items-center justify-center text-white">✓</div>
-                            </div>
-                            <h3 class="text-lg font-bold text-slate-800">Premium Comfort Upgrade</h3>
-                            <p class="text-xs text-slate-400 mt-1">5 Items</p>
-                        </div>
-                    </div>
-                    <div class="flex space-x-8">
-                        <div>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase">Member</p>
-                            <p class="text-xl font-bold text-slate-800">$17,172</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-pink-500 uppercase">Savings</p>
-                            <p class="text-xl font-bold text-pink-500">$1,891</p>
-                        </div>
-                    </div>
+            <section id="view-estimates" class="app-section active max-w-3xl mx-auto space-y-4">
+                <div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">
+                    Click "ADD ESTIMATE" to generate a new proposal.
                 </div>
             </section>
             
@@ -218,6 +198,7 @@
         </div>
     </div>
 
+    <!-- ADD CUSTOMER MODAL -->
     <div id="customer-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-blue-600 p-5 flex justify-between items-center">
@@ -254,6 +235,7 @@
         </div>
     </div>
 
+    <!-- CLIENT PROFILE MODAL -->
     <div id="client-profile-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-slate-800 p-5 flex justify-between items-center">
@@ -263,13 +245,9 @@
                 </h3>
                 <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white transition text-2xl leading-none">&times;</button>
             </div>
-            
             <div class="p-6">
                 <div class="mb-6 pb-6 border-b border-slate-200" id="profile-header"></div>
-                
-                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4 flex items-center">
-                    Service Timeline
-                </h4>
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4 flex items-center">Service Timeline</h4>
                 <div id="profile-history-feed" class="space-y-3 max-h-96 overflow-y-auto pr-2 line-item-scroll">
                     <!-- Cards get injected here -->
                 </div>
@@ -277,6 +255,7 @@
         </div>
     </div>
 
+    <!-- JOB ACTION & CLOSEOUT MODAL -->
     <div id="job-action-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-blue-600 p-5 flex justify-between items-center">
@@ -324,7 +303,6 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Warranty Expiration</label>
                         <input type="date" id="closeout-warranty" class="w-full border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-green-500">
                     </div>
-                    <!-- NEW PARTS TRACKER UI -->
                     <div class="mt-4 border-t border-slate-200 pt-4">
                         <div class="flex justify-between items-end mb-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Parts & Materials Used</label>
@@ -334,7 +312,6 @@
                             </button>
                         </div>
                         <div id="closeout-parts-list" class="space-y-2 max-h-32 overflow-y-auto pr-2 line-item-scroll">
-                            <!-- Part rows injected here -->
                         </div>
                     </div>
                     <p class="text-[10px] text-slate-400 italic">* Completing this job will automatically trigger the Luxury Invoice Engine.</p>
@@ -350,12 +327,10 @@
     <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // ==========================================
-        // SUPABASE INITIALIZATION & SAAS STATE
+        // SUPABASE INITIALIZATION
         // ==========================================
         const supabaseUrl = 'https://otmwvymcerqaqalipmqs.supabase.co';
         const supabaseKey = 'sb_publishable_UtoKnZAPU9gDxD7kCGvk_A_OhKMj1ft';
-        
-        // WE RENAMED THIS TO "db" TO FIX THE CRASH!
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const COMPANY_ID = 'altair-001'; 
@@ -404,7 +379,7 @@
         }
 
         // ==========================================
-        // CLIENT DIRECTORY ENGINE (SUPABASE)
+        // CLIENT DIRECTORY ENGINE
         // ==========================================
         async function fetchDirectoryData() {
             document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Syncing with Supabase...</p>';
@@ -470,22 +445,12 @@
                        c.phone.toLowerCase().includes(searchTerm) || 
                        c.address.toLowerCase().includes(searchTerm);
             });
-            
             renderDirectoryList(filteredCustomers); 
         };
 
-        // ==========================================
-        // NEW CUSTOMER ENGINE (SUPABASE)
-        // ==========================================
-        function openCustomerModal() { 
-            const m = document.getElementById('customer-modal'); 
-            m.style.display = 'flex'; 
-        }
-        
+        function openCustomerModal() { document.getElementById('customer-modal').style.display = 'flex'; }
         function closeCustomerModal() {
-            const m = document.getElementById('customer-modal');
-            m.style.display = 'none'; 
-            
+            document.getElementById('customer-modal').style.display = 'none'; 
             document.getElementById('cust-first').value = ''; document.getElementById('cust-last').value = '';
             document.getElementById('cust-phone').value = ''; document.getElementById('cust-email').value = '';
             document.getElementById('cust-address').value = '';
@@ -507,16 +472,9 @@
             btn.classList.replace('bg-blue-600', 'bg-slate-400'); 
             btn.classList.add('cursor-not-allowed');
 
-            const { error } = await db
-                .from('customers')
-                .insert([{ 
-                    company_id: COMPANY_ID,
-                    first_name: first, 
-                    last_name: last, 
-                    phone: phone, 
-                    email: email, 
-                    address: address 
-                }]);
+            const { error } = await db.from('customers').insert([{ 
+                company_id: COMPANY_ID, first_name: first, last_name: last, phone: phone, email: email, address: address 
+            }]);
 
             if (error) {
                 alert("Database Error: " + error.message);
@@ -532,16 +490,11 @@
         }
 
         // ==========================================
-        // DISPATCH ENGINE (SUPABASE)
+        // DISPATCH ENGINE
         // ==========================================
         async function fetchLiveAppEngineData() {
-            const { data: activeJobs, error } = await db
-                .from('jobs')
-                .select('*')
-                .eq('company_id', COMPANY_ID)
-                .neq('status', 'Completed');
-
-            if (error) { console.error(error); return; }
+            const { data: activeJobs, error } = await db.from('jobs').select('*').eq('company_id', COMPANY_ID).neq('status', 'Completed');
+            if (error) return;
 
             const jobsElem = document.getElementById('kpi-active-jobs');
             if(jobsElem) jobsElem.innerText = activeJobs.length;
@@ -579,7 +532,6 @@
             
             const select = document.getElementById('job-status-select');
             select.value = Array.from(select.options).some(opt => opt.value === currentStatus) ? currentStatus : "Scheduled";
-            
             toggleCloseoutFields();
         };
 
@@ -587,7 +539,6 @@
             document.getElementById('job-action-modal').style.display = 'none';
             document.getElementById('btn-save-job').innerText = "Update Status";
             document.getElementById('btn-save-job').classList.remove('cursor-not-allowed', 'opacity-70');
-            
             document.getElementById('closeout-hours').value = '';
             document.getElementById('closeout-filter').value = '';
             document.getElementById('closeout-system').value = '';
@@ -632,25 +583,14 @@
             btn.classList.add('cursor-not-allowed', 'opacity-70');
 
             if (status === 'Completed') {
-                const { error } = await db
-                    .from('jobs')
-                    .update({ status: 'Completed', closed_at: new Date() })
-                    .eq('id', jobId);
-                    
+                const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
-                
                 btn.innerHTML = `Invoice Engine Triggered!`;
                 btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
                 setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
-
             } else {
-                const { error } = await db
-                    .from('jobs')
-                    .update({ status: status })
-                    .eq('id', jobId);
-
+                const { error } = await db.from('jobs').update({ status: status }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
-
                 btn.innerHTML = `Status Updated!`;
                 btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
                 setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
@@ -658,15 +598,13 @@
         }
 
         // ==========================================
-        // CLIENT PROFILE ENGINE (Needs Supabase logic next)
+        // CLIENT PROFILE ENGINE
         // ==========================================
         window.showProfile = function(custID) {
             const m = document.getElementById('client-profile-modal');
             m.style.display = 'flex';
-            
             const historyFeed = document.getElementById('profile-history-feed');
             const header = document.getElementById('profile-header');
-            
             const cust = globalCustomerDirectory.find(c => c.id === custID);
             if (cust) {
                 header.innerHTML = `
@@ -684,134 +622,133 @@
             historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">History sync migrating to Supabase...</p></div>';
         };
 
-        window.closeProfileModal = function() {
-            document.getElementById('client-profile-modal').style.display = 'none';
+        window.closeProfileModal = function() { document.getElementById('client-profile-modal').style.display = 'none'; };
+
+        // ==========================================
+        // ESTIMATE ENGINE
+        // ==========================================
+        async function fetchPriceBook() {
+            const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
+            if (!error) globalPriceBook = data;
+        }
+
+        function openEstimateModal() { 
+            const m = document.getElementById('estimate-modal');
+            m.style.display = 'flex'; 
+            document.getElementById('est-line-items').innerHTML = '';
+            
+            const select = document.getElementById('est-customer-select');
+            let options = '<option value="">-- Choose a Customer --</option>';
+            globalCustomerDirectory.forEach(cust => {
+                options += `<option value="${cust.id}">${cust.name}</option>`;
+            });
+            select.innerHTML = options;
+            addLineItem();
+        }
+
+        function closeEstimateModal() {
+            document.getElementById('estimate-modal').style.display = 'none'; 
+            document.getElementById('btn-submit-est').innerText = 'Save to Dispatch Board';
+            document.getElementById('btn-submit-est').className = "w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg";
+            document.getElementById('est-total-display').innerText = "0.00";
+            document.getElementById('est-line-items').innerHTML = '';
+        }
+
+        window.addLineItem = function() {
+            const container = document.getElementById('est-line-items');
+            const row = document.createElement('div');
+            row.className = "flex space-x-2 items-center line-item";
+            
+            let pbOptions = '<option value="" data-price="0">-- Select Item --</option>';
+            globalPriceBook.forEach(item => {
+                pbOptions += `<option value="${item.name}" data-price="${item.price}">${item.name}</option>`;
+            });
+
+            row.innerHTML = `
+                <select onchange="autoFillPrice(this)" class="w-1/2 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none bg-white item-name">
+                    ${pbOptions}
+                </select>
+                <input type="number" placeholder="Qty" value="1" min="1" oninput="calculateEstTotal()" class="w-1/6 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-qty">
+                <input type="number" placeholder="Price" value="0.00" oninput="calculateEstTotal()" class="w-1/4 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-price">
+                <button onclick="removeLineItem(this)" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-lg">✖</button>
+            `;
+            container.appendChild(row);
         };
 
-        // ==========================================
-        // ESTIMATE ENGINE (Needs Supabase logic next)
-        // ==========================================
-        // ==========================================
-    // ESTIMATE ENGINE (SUPABASE)
-    // ==========================================
-    async function fetchPriceBook() {
-        const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
-        if (!error) globalPriceBook = data;
-    }
+        window.autoFillPrice = function(selectElem) {
+            const selectedOption = selectElem.options[selectElem.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const priceInput = selectElem.parentElement.querySelector('.item-price');
+            priceInput.value = parseFloat(price).toFixed(2);
+            calculateEstTotal(); 
+        };
 
-    function openEstimateModal() { 
-        const m = document.getElementById('estimate-modal');
-        m.style.display = 'flex'; 
-        document.getElementById('est-line-items').innerHTML = '';
-        
-        // 1. Populate the Customer Dropdown
-        const select = document.getElementById('est-customer-select');
-        let options = '-- Choose a Customer --';
-        globalCustomerDirectory.forEach(cust => {
-            options += `${cust.name}`;
-        });
-        select.innerHTML = options;
+        window.removeLineItem = function(btn) {
+            btn.parentElement.remove();
+            calculateEstTotal();
+        };
 
-        // 2. Add the first blank line item
-        addLineItem();
-    }
+        window.calculateEstTotal = function() {
+            let total = 0;
+            document.querySelectorAll('.line-item').forEach(row => {
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                total += (qty * price);
+            });
+            document.getElementById('est-total-display').innerText = total.toFixed(2);
+        };
 
-    function closeEstimateModal() {
-        document.getElementById('estimate-modal').style.display = 'none'; 
-        document.getElementById('btn-submit-est').innerText = 'Save to Dispatch Board';
-        document.getElementById('btn-submit-est').className = "w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg";
-        document.getElementById('est-total-display').innerText = "0.00";
-        document.getElementById('est-line-items').innerHTML = '';
-    }
-
-    function addLineItem() {
-        const container = document.getElementById('est-line-items');
-        const row = document.createElement('div');
-        row.className = "flex space-x-2 items-center line-item";
-        
-        // Build dropdown from Price Book
-        let pbOptions = '-- Select Item --';
-        globalPriceBook.forEach(item => {
-            pbOptions += `${item.name}`;
-        });
-
-        row.innerHTML = `
+        async function submitEstimate() {
+            const select = document.getElementById('est-customer-select');
+            if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
             
-                ${pbOptions}
-            
-            
-            
-            ✖
-        `;
-        container.appendChild(row);
-    }
+            const custID = select.options[select.selectedIndex].value;
+            const amount = document.getElementById('est-total-display').innerText;
+            const btn = document.getElementById('btn-submit-est');
 
-    function autoFillPrice(selectElem) {
-        const selectedOption = selectElem.options[selectElem.selectedIndex];
-        const price = selectedOption.getAttribute('data-price');
-        const priceInput = selectElem.parentElement.querySelector('.item-price');
-        priceInput.value = parseFloat(price).toFixed(2);
-        calculateEstTotal(); 
-    }
+            if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
 
-    function removeLineItem(btn) {
-        btn.parentElement.remove();
-        calculateEstTotal();
-    }
+            btn.innerText = "Saving to Database...";
+            btn.classList.replace('bg-cyan-500', 'bg-slate-400');
+            btn.classList.add('cursor-not-allowed');
 
-    function calculateEstTotal() {
-        let total = 0;
-        document.querySelectorAll('.line-item').forEach(row => {
-            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-            total += (qty * price);
-        });
-        document.getElementById('est-total-display').innerText = total.toFixed(2);
-    }
+            let lineItems = [];
+            document.querySelectorAll('.line-item').forEach(row => {
+                const nameElem = row.querySelector('.item-name');
+                const name = nameElem.options[nameElem.selectedIndex].text;
+                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                if (name && qty > 0) lineItems.push({ name, qty, price });
+            });
 
-    async function submitEstimate() {
-        const select = document.getElementById('est-customer-select');
-        if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
-        
-        const custID = select.options[select.selectedIndex].value;
-        const amount = document.getElementById('est-total-display').innerText;
-        const btn = document.getElementById('btn-submit-est');
+            const { error } = await db.from('estimates').insert([{ 
+                company_id: COMPANY_ID, customer_id: custID, title: 'Service Estimate', amount: amount, line_items: lineItems 
+            }]);
 
-        if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
-
-        btn.innerText = "Saving to Database...";
-        btn.classList.replace('bg-cyan-500', 'bg-slate-400');
-        btn.classList.add('cursor-not-allowed');
-
-        // Package the line items as JSON
-        let lineItems = [];
-        document.querySelectorAll('.line-item').forEach(row => {
-            const nameElem = row.querySelector('.item-name');
-            const name = nameElem.options[nameElem.selectedIndex].text;
-            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-            if (name && qty > 0) lineItems.push({ name, qty, price });
-        });
-
-        const { error } = await db.from('estimates').insert([{ 
-            company_id: COMPANY_ID, 
-            customer_id: custID, 
-            title: 'Service Estimate', 
-            amount: amount,
-            line_items: lineItems 
-        }]);
-
-        if (error) {
-            alert("Error: " + error.message);
-            btn.innerText = "Save to Dispatch Board";
-            btn.classList.replace('bg-slate-400', 'bg-cyan-500');
-            btn.classList.remove('cursor-not-allowed');
-        } else {
-            btn.innerText = "Estimate Saved!";
-            btn.classList.replace('bg-slate-400', 'bg-green-500');
-            setTimeout(closeEstimateModal, 1500);
+            if (error) {
+                alert("Error: " + error.message);
+                btn.innerText = "Save to Dispatch Board";
+                btn.classList.replace('bg-slate-400', 'bg-cyan-500');
+                btn.classList.remove('cursor-not-allowed');
+            } else {
+                btn.innerText = "Estimate Saved!";
+                btn.classList.replace('bg-slate-400', 'bg-green-500');
+                setTimeout(closeEstimateModal, 1500);
+            }
         }
-    }
+
+        // ==========================================
+        // INVOICE ENGINE PLACEHOLDERS
+        // ==========================================
+        window.fetchInvoicesData = function() {
+            const feed = document.getElementById('invoices-feed');
+            feed.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">Invoice fetch logic migrating to Supabase...</div>';
+        };
+
+        window.markAsPaid = function(row) {
+             alert("Billing updates moving to Supabase!");
+        };
+
         // ==========================================
         // INITIALIZATION
         // ==========================================
@@ -819,11 +756,10 @@
             const dateElem = document.getElementById('currentDate');
             if(dateElem) dateElem.textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
             
-            // Fetch live database info!
             fetchLiveAppEngineData();
             fetchDirectoryData();
             fetchInvoicesData();
-            fetchPriceBook();
+            fetchPriceBook(); 
         };
 
         window.addEventListener('DOMContentLoaded', (event) => {
