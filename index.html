@@ -645,60 +645,37 @@
             btn.classList.add('cursor-not-allowed', 'opacity-70');
 
             if (status === 'Completed') {
-                // ... existing job update code ...
-const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
-if(error) { alert("Error: " + error.message); return; }
-
-btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
-btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg flex justify-center items-center";
-
-// Trigger the invoice and inventory deduction engine
-await generateLiveInvoice(
-if (partsUsed.length > 0) {
-    for (const part of partsUsed) {
-        const { data: currentItem } = await db
-            .from('inventory')
-            .select('id, stock_qty')
-            .eq('company_id', COMPANY_ID)
-            .ilike('part_name', part.name)
-            .single();
-
-        if (currentItem) {
-            // Strictly enforce direct subtraction from the quantity column
-            const newQty = currentItem.stock_qty - part.qty;
-            await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
-        }
-    }
-});
-                // Inside generateLiveInvoice()
-
-}
-
-// Enterprise UX: Explicit confirmation checkmark state before closing
-btn.innerHTML = `
-    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-    </svg>
-    Job Closed Successfully
-`;
-btn.classList.replace('bg-emerald-500', 'bg-green-600');
-
-// Hold the success state for 1.5s so the tech can register it, then refresh
-setTimeout(() => { 
-    closeJobModal(); 
-    fetchLiveAppEngineData(); 
-}, 1500);
+                const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
+                let partsUsed = [];
+                document.querySelectorAll('.closeout-part-item').forEach(row => {
+                    const name = row.querySelector('.part-name').value;
+                    const qty = parseInt(row.querySelector('.part-qty').value) || 0;
+                    if (name && qty > 0) partsUsed.push({ name, qty });
                 });
 
                 const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
                 
-                btn.innerHTML = `Generating Invoice...`;
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
+                btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
+                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg flex justify-center items-center";
                 
+                // Trigger the invoice and inventory deduction engine
                 await generateLiveInvoice(jobId, hours, partsUsed);
 
-                setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
+                // Enterprise UX: Explicit confirmation checkmark state before closing
+                btn.innerHTML = `
+                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Job Closed Successfully
+                `;
+                btn.classList.replace('bg-emerald-500', 'bg-green-600');
+
+                // Hold the success state for 1.5s so the tech can register it, then refresh
+                setTimeout(() => { 
+                    closeJobModal(); 
+                    fetchLiveAppEngineData(); 
+                }, 1500);
             } else {
                 const { error } = await db.from('jobs').update({ status: status }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
@@ -759,6 +736,7 @@ setTimeout(() => {
 
             if (invoiceError) console.error("Invoice Save Error:", invoiceError.message);
 
+            // Inventory Deduction Engine
             if (partsUsed.length > 0) {
                 for (const part of partsUsed) {
                     const { data: currentItem } = await db
@@ -814,6 +792,8 @@ setTimeout(() => {
 
             pdfMake.createPdf(docDefinition).open();
         }
+
+       
 
         // ==========================================
         // CLIENT PROFILE ENGINE
