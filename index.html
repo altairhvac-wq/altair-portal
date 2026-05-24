@@ -962,20 +962,44 @@
                 if (name && qty > 0) lineItems.push({ name, qty, price });
             });
 
-            const { error } = await db.from('estimates').insert([{ 
+            // 1. SAVE TO ESTIMATES TABLE
+            const { error: estError } = await db.from('estimates').insert([{ 
                 company_id: COMPANY_ID, customer_id: custID, title: 'Service Estimate', amount: amount, line_items: lineItems 
             }]);
 
-            if (error) {
-                alert("Error: " + error.message);
+            if (estError) {
+                alert("Error: " + estError.message);
                 btn.innerText = "Save to Dispatch Board";
                 btn.classList.replace('bg-slate-400', 'bg-cyan-500');
                 btn.classList.remove('cursor-not-allowed');
-            } else {
-                btn.innerText = "Estimate Saved!";
-                btn.classList.replace('bg-slate-400', 'bg-green-500');
-                setTimeout(closeEstimateModal, 1500);
+                return;
             }
+
+            // 2. PULL CUSTOMER INFO FROM YOUR GLOBAL DIRECTORY
+            const customer = globalCustomerDirectory.find(c => c.id === custID);
+
+            // 3. PUSH A NEW TICKET TO THE DISPATCH BOARD (JOBS TABLE)
+            if (customer) {
+                const { error: jobError } = await db.from('jobs').insert([{
+                    company_id: COMPANY_ID,
+                    name: customer.name,
+                    phone: customer.phone,
+                    address: customer.address,
+                    type: 'Estimate / Proposal', // Clearly labels it on the board
+                    status: 'Scheduled'
+                }]);
+                
+                if (jobError) console.error("Failed to create dispatch ticket:", jobError.message);
+            }
+
+            // 4. UPDATE UI & REFRESH BOARD
+            btn.innerText = "Estimate Saved & Dispatched!";
+            btn.classList.replace('bg-slate-400', 'bg-green-500');
+            
+            // Force the dispatch board to refresh in the background
+            fetchLiveAppEngineData();
+
+            setTimeout(closeEstimateModal, 1500);
         }
 
         // ==========================================
