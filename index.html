@@ -8,14 +8,11 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1e293b">
     
-    <!-- SUPABASE CLIENT -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- PDFMAKE ENGINE -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
     
-    <!-- CUSTOM APP ICONS -->
     <link rel="apple-touch-icon" href="https://i.postimg.cc/GhqPQBt9/Altair-Logo.png">
     <link rel="icon" sizes="192x192" href="https://i.postimg.cc/GhqPQBt9/Altair-Logo.png">
     <title>Altair Field Tech Portal</title>
@@ -160,7 +157,6 @@
         </div>
     </main>
         
-    <!-- MODALS -->
     <div id="estimate-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-slate-800 p-5 flex justify-between items-center">
@@ -206,7 +202,6 @@
         </div>
     </div>
 
-    <!-- ADD CUSTOMER MODAL -->
     <div id="customer-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-blue-600 p-5 flex justify-between items-center">
@@ -243,7 +238,6 @@
         </div>
     </div>
 
-    <!-- CLIENT PROFILE MODAL -->
     <div id="client-profile-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-slate-800 p-5 flex justify-between items-center">
@@ -257,13 +251,11 @@
                 <div class="mb-6 pb-6 border-b border-slate-200" id="profile-header"></div>
                 <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4 flex items-center">Service Timeline</h4>
                 <div id="profile-history-feed" class="space-y-3 max-h-96 overflow-y-auto pr-2 line-item-scroll">
-                    <!-- Cards get injected here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
 
-    <!-- JOB ACTION & CLOSEOUT MODAL -->
     <div id="job-action-modal" class="absolute inset-0 bg-slate-900 bg-opacity-60 z-50 justify-center items-center backdrop-blur-sm p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-blue-600 p-5 flex justify-between items-center">
@@ -332,7 +324,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // ==========================================
         // SUPABASE INITIALIZATION
@@ -348,22 +339,25 @@
         // ==========================================
         let globalPriceBook = [];
         let globalCustomerDirectory = []; 
-        let globalInventory = [];
 
         // ==========================================
         // UI HELPERS & NAVIGATION
         // ==========================================
-        window.onclick = function(event) {
-            const jobModal = document.getElementById('job-action-modal');
-            const estModal = document.getElementById('estimate-modal');
-            const custModal = document.getElementById('customer-modal');
-            const profileModal = document.getElementById('client-profile-modal'); 
-            
-            if (event.target === estModal) closeEstimateModal();
-            if (event.target === custModal) closeCustomerModal();
-            if (event.target === profileModal) closeProfileModal();
-            if (event.target === jobModal) closeJobModal(); 
-        };
+        
+        // Touch-safe modal closing (prevents mobile keyboard from closing popups)
+        window.addEventListener('mousedown', function(event) {
+            if (event.target.id === 'estimate-modal') closeEstimateModal();
+            if (event.target.id === 'customer-modal') closeCustomerModal();
+            if (event.target.id === 'client-profile-modal') closeProfileModal();
+            if (event.target.id === 'job-action-modal') closeJobModal();
+        });
+
+        window.addEventListener('touchstart', function(event) {
+            if (event.target.id === 'estimate-modal') closeEstimateModal();
+            if (event.target.id === 'customer-modal') closeCustomerModal();
+            if (event.target.id === 'client-profile-modal') closeProfileModal();
+            if (event.target.id === 'job-action-modal') closeJobModal();
+        });
 
         function switchTab(tabName) {
             try {
@@ -387,96 +381,54 @@
         }
 
         // ==========================================
-        // ALTAIR INVOICE ENGINE 
+        // PDF INVOICE ENGINE TEST
         // ==========================================
         window.testPDFEngine = function() {
-            // We will eventually pass real data into this function
             const docDefinition = {
                 content: [
-                    // 1. Header Row
                     {
                         columns: [
                             { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
                             { text: 'INVOICE\n# INV-0001', style: 'invoiceTitle', alignment: 'right' }
                         ]
                     },
-                    // Cyan Divider Line
                     { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] }, 
-
-                    // 2. Company & Client Info Row
                     {
                         columns: [
-                            {
-                                text: [
-                                    { text: 'From:\n', bold: true, color: '#64748b' },
-                                    'ALTAIR Climate Control\nLayton, UT'
-                                ]
-                            },
-                            {
-                                text: [
-                                    { text: 'Bill To:\n', bold: true, color: '#64748b' },
-                                    'Client Name\n123 Service Address\nCity, UT'
-                                ],
-                                alignment: 'right'
-                            }
+                            { text: [{ text: 'From:\n', bold: true, color: '#64748b' }, 'ALTAIR Climate Control\nLayton, UT'] },
+                            { text: [{ text: 'Bill To:\n', bold: true, color: '#64748b' }, 'Client Name\n123 Service Address\nCity, UT'], alignment: 'right' }
                         ],
-                        margin: [0, 0, 0, 30] // Adds space below this section
+                        margin: [0, 0, 0, 30] 
                     },
-
-                    // 3. Line Items Table
                     {
                         style: 'invoiceTable',
                         table: {
                             headerRows: 1,
-                            widths: ['*', 'auto', 'auto', 'auto'], // '*' means "take up remaining space"
+                            widths: ['*', 'auto', 'auto', 'auto'], 
                             body: [
-                                // Table Header
-                                [
-                                    { text: 'Description', style: 'tableHeader' },
-                                    { text: 'Qty', style: 'tableHeader', alignment: 'center' },
-                                    { text: 'Price', style: 'tableHeader', alignment: 'right' },
-                                    { text: 'Total', style: 'tableHeader', alignment: 'right' }
-                                ],
-                                // Hardcoded sample data (we will automate this next)
+                                [ { text: 'Description', style: 'tableHeader' }, { text: 'Qty', style: 'tableHeader', alignment: 'center' }, { text: 'Price', style: 'tableHeader', alignment: 'right' }, { text: 'Total', style: 'tableHeader', alignment: 'right' } ],
                                 ['Diagnostic Fee', { text: '1', alignment: 'center' }, { text: '$89.00', alignment: 'right' }, { text: '$89.00', alignment: 'right' }],
                                 ['Capacitor Replacement', { text: '1', alignment: 'center' }, { text: '$185.00', alignment: 'right' }, { text: '$185.00', alignment: 'right' }],
                                 ['Labor (Hours)', { text: '1.5', alignment: 'center' }, { text: '$120.00', alignment: 'right' }, { text: '$180.00', alignment: 'right' }]
                             ]
                         },
-                        layout: 'lightHorizontalLines' // Gives it a clean, modern look
+                        layout: 'lightHorizontalLines' 
                     },
-
-                    // 4. Totals Area
                     {
                         columns: [
                             { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
-                            {
-                                table: {
-                                    widths: ['*', 'auto'],
-                                    body: [
-                                        ['Total Due:', { text: '$454.00', bold: true, fontSize: 16 }]
-                                    ]
-                                },
-                                layout: 'noBorders',
-                                alignment: 'right',
-                                margin: [0, 20, 0, 0]
-                            }
+                            { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: '$454.00', bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
                         ]
                     }
                 ],
-                // 5. Design Styles
                 styles: {
                     brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
                     invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
                     tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
                     invoiceTable: { margin: [0, 5, 0, 15] }
                 },
-                defaultStyle: {
-                    columnGap: 20
-                }
+                defaultStyle: { columnGap: 20 }
             };
-
-            // Generate it!
             pdfMake.createPdf(docDefinition).open();
         };
 
@@ -669,13 +621,11 @@
             const row = document.createElement('div');
             row.className = "flex space-x-2 items-center closeout-part-item mb-2";
             
-            // Auto-generate the dropdown options from your live Price Book
             let pbOptions = '<option value="">-- Select a Part --</option>';
             globalPriceBook.forEach(item => {
                 pbOptions += `<option value="${item.name}">${item.name}</option>`;
             });
 
-            // Replaces the text input with a <select> dropdown
             row.innerHTML = `
                 <select class="w-2/3 border border-slate-300 rounded-lg p-2 text-sm focus:border-green-500 outline-none bg-white part-name">
                     ${pbOptions}
@@ -695,7 +645,6 @@
             btn.classList.add('cursor-not-allowed', 'opacity-70');
 
             if (status === 'Completed') {
-                // 1. GATHER CLOSEOUT DATA
                 const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
                 let partsUsed = [];
                 document.querySelectorAll('.closeout-part-item').forEach(row => {
@@ -704,14 +653,12 @@
                     if (name && qty > 0) partsUsed.push({ name, qty });
                 });
 
-                // 2. UPDATE JOB STATUS
                 const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
                 if(error) { alert("Error: " + error.message); return; }
                 
                 btn.innerHTML = `Generating Invoice...`;
                 btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
                 
-                // 3. FIRE THE LIVE INVOICE ENGINE
                 await generateLiveInvoice(jobId, hours, partsUsed);
 
                 setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
@@ -725,7 +672,6 @@
         }
 
         async function generateLiveInvoice(jobId, hours, partsUsed) {
-            // 1. Fetch Job Data
             const { data: jobData } = await db.from('jobs').select('*').eq('id', jobId).single();
             if (!jobData) return;
 
@@ -740,7 +686,6 @@
 
             let grandTotal = 0;
 
-            // 2. Calculate Labor
             if (hours > 0) {
                 const laborRate = 120.00; 
                 const laborTotal = hours * laborRate;
@@ -754,7 +699,6 @@
                 ]);
             }
 
-            // 3. Calculate Parts
             partsUsed.forEach(part => {
                 const pbItem = globalPriceBook.find(item => item.name.toLowerCase() === part.name.toLowerCase());
                 const price = pbItem ? pbItem.price : 0.00; 
@@ -769,15 +713,15 @@
                 ]);
             });
 
-            // 4. Save Invoice to Supabase
-            await db.from('invoices').insert([{
+            const { error: invoiceError } = await db.from('invoices').insert([{
                 company_id: COMPANY_ID,
                 job_id: jobId,
                 amount: grandTotal, 
                 status: 'Unpaid'
             }]);
 
-            // 5. Sync Inventory Safely
+            if (invoiceError) console.error("Invoice Save Error:", invoiceError.message);
+
             if (partsUsed.length > 0) {
                 for (const part of partsUsed) {
                     const { data: currentItem } = await db
@@ -789,13 +733,11 @@
 
                     if (currentItem) {
                         const newQty = currentItem.stock_qty - part.qty;
-                        // This strictly targets the quantity column. It will never accidentally overwrite your location data or part names.
                         await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
                     }
                 }
             }
 
-            // 6. Generate the PDF Document
             const docDefinition = {
                 content: [
                     {
@@ -835,8 +777,6 @@
 
             pdfMake.createPdf(docDefinition).open();
         }
-
-        
 
         // ==========================================
         // CLIENT PROFILE ENGINE
@@ -898,7 +838,7 @@
         window.addLineItem = function() {
             const container = document.getElementById('est-line-items');
             const row = document.createElement('div');
-            row.className = "flex space-x-2 items-center line-item";
+            row.className = "flex space-x-2 items-center line-item mb-2";
             
             let pbOptions = '<option value="" data-price="0">-- Select Item --</option>';
             globalPriceBook.forEach(item => {
@@ -975,41 +915,37 @@
                 return;
             }
 
-            // 2. PULL CUSTOMER INFO FROM YOUR GLOBAL DIRECTORY
+            // 2. PULL CUSTOMER INFO
             const customer = globalCustomerDirectory.find(c => c.id === custID);
 
-            // 3. PUSH A NEW TICKET TO THE DISPATCH BOARD (JOBS TABLE)
+            // 3. PUSH A NEW TICKET TO DISPATCH BOARD
             if (customer) {
                 const { error: jobError } = await db.from('jobs').insert([{
                     company_id: COMPANY_ID,
                     name: customer.name,
                     phone: customer.phone,
                     address: customer.address,
-                    type: 'Estimate / Proposal', // Clearly labels it on the board
+                    type: 'Estimate / Proposal', 
                     status: 'Scheduled'
                 }]);
                 
                 if (jobError) console.error("Failed to create dispatch ticket:", jobError.message);
             }
 
-            // 4. UPDATE UI & REFRESH BOARD
+            // 4. UPDATE UI
             btn.innerText = "Estimate Saved & Dispatched!";
             btn.classList.replace('bg-slate-400', 'bg-green-500');
-            
-            // Force the dispatch board to refresh in the background
             fetchLiveAppEngineData();
-
             setTimeout(closeEstimateModal, 1500);
         }
 
         // ==========================================
-        // INVOICE ENGINE
+        // INVOICE & BILLING ENGINE
         // ==========================================
         window.fetchInvoicesData = async function() {
             const feed = document.getElementById('invoices-feed');
             feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
 
-            // 1. Fetch invoices and pull the job name using Supabase's automatic relational mapping
             const { data: invoices, error } = await db
                 .from('invoices')
                 .select('*, jobs(name)')
@@ -1025,14 +961,11 @@
             let paidTotal = 0;
             let html = '';
 
-            // 2. Handle empty state
             if (!invoices || invoices.length === 0) {
                 html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
             } else {
-                // 3. Loop through invoices, build the UI, and run the math
                 invoices.forEach(inv => {
                     const amount = parseFloat(inv.amount) || 0;
-                    // Supabase returns related data in an object. We grab the job name here:
                     const jobName = inv.jobs ? inv.jobs.name : 'Service Call'; 
                     const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -1043,7 +976,6 @@
                     const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
                     const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
                     
-                    // Show a "Paid" badge or an interactive "Mark Paid" button
                     const actionBtn = isPaid 
                         ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
                         : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">Mark Paid</button>`;
@@ -1063,27 +995,15 @@
                 });
             }
 
-            // 4. Update the KPI displays at the top
             document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
             document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
             feed.innerHTML = html;
         };
 
         window.markAsPaid = async function(invoiceId) {
-            // Update the status in the database
             const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
-            
-            if (error) {
-                alert("Error updating billing: " + error.message);
-                return;
-            }
-            
-            // Instantly refresh the screen to move the money from Unpaid to Paid
+            if (error) { alert("Error updating billing: " + error.message); return; }
             fetchInvoicesData();
-        };
-
-        window.markAsPaid = function(row) {
-             alert("Billing updates moving to Supabase!");
         };
 
         // ==========================================
@@ -1115,7 +1035,6 @@
             const navInvoices = document.getElementById('nav-invoices');
             if (navInvoices) navInvoices.addEventListener('click', () => switchTab('invoices'));
 
-            // BIND THE PDF TEST BUTTON HERE
             const pdfTestBtn = document.getElementById('test-pdf-btn');
             if (pdfTestBtn) pdfTestBtn.addEventListener('click', window.testPDFEngine);
         });
