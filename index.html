@@ -794,33 +794,99 @@
             pdfMake.createPdf(docDefinition).open();
         }
 
-        // ==========================================
+       // ==========================================
         // CLIENT PROFILE ENGINE
         // ==========================================
-        window.showProfile = function(custID) {
+        window.showProfile = async function(custID) {
             const m = document.getElementById('client-profile-modal');
             m.style.display = 'flex';
             const historyFeed = document.getElementById('profile-history-feed');
             const header = document.getElementById('profile-header');
+            
+            // Find the customer in our local directory
             const cust = globalCustomerDirectory.find(c => c.id === custID);
-            if (cust) {
-                header.innerHTML = `
-                    <div class="flex flex-col sm:flex-row justify-between sm:items-start">
-                        <div class="mb-2 sm:mb-0">
-                            <h2 class="text-2xl font-black text-slate-800">${cust.name}</h2>
-                            <p class="text-slate-500 text-sm mt-1">${cust.address}</p>
-                        </div>
-                        <div class="sm:text-right">
-                            <span class="inline-block bg-blue-50 border border-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm shadow-sm">${cust.phone}</span>
-                        </div>
+            if (!cust) return;
+
+            // Render the Header
+            header.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between sm:items-start">
+                    <div class="mb-2 sm:mb-0">
+                        <h2 class="text-2xl font-black text-slate-800">${cust.name}</h2>
+                        <p class="text-slate-500 text-sm mt-1">${cust.address}</p>
                     </div>
-                `;
+                    <div class="sm:text-right">
+                        <span class="inline-block bg-blue-50 border border-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm shadow-sm">${cust.phone}</span>
+                    </div>
+                </div>
+            `;
+
+            // Show a loading state
+            historyFeed.innerHTML = '<p class="text-slate-400 text-center py-8">Retrieving service history...</p>';
+
+            // Fetch past jobs AND their related invoices using a Supabase relational join
+            const { data: historyData, error } = await db
+                .from('jobs')
+                .select(`
+                    id, type, status, created_at,
+                    invoices ( amount, status, id )
+                `)
+                .eq('company_id', COMPANY_ID)
+                .eq('name', cust.name) // Match the job to the customer
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                historyFeed.innerHTML = `<p class="text-red-500 text-center py-4">Error fetching history: ${error.message}</p>`;
+                return;
             }
-            historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">History sync migrating to Supabase...</p></div>';
+
+            if (!historyData || historyData.length === 0) {
+                historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">No previous service history found.</p></div>';
+                return;
+            }
+
+            // Render the chronological timeline
+            let html = '';
+            historyData.forEach(job => {
+                const dateStr = new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const isCompleted = job.status === 'Completed';
+                
+                // Dynamic icon based on job status
+                const statusIcon = isCompleted 
+                    ? `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+                    : `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                
+                // Extract invoice data if it exists for this job
+                let billingInfo = '';
+                if (job.invoices && job.invoices.length > 0) {
+                    // Handle array return from PostgREST join
+                    const inv = Array.isArray(job.invoices) ? job.invoices[0] : job.invoices;
+                    const invColor = inv.status === 'Paid' ? 'text-green-600' : 'text-yellow-600';
+                    billingInfo = `
+                        <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Invoice #${inv.id.substring(0,6).toUpperCase()}</span>
+                            <span class="font-bold ${invColor}">$${parseFloat(inv.amount).toFixed(2)} (${inv.status})</span>
+                        </div>
+                    `;
+                }
+
+                html += `
+                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-3 hover:shadow-md transition">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center space-x-3">
+                            ${statusIcon}
+                            <div>
+                                <h4 class="font-bold text-slate-800">${job.type || 'Service Call'}</h4>
+                                <p class="text-xs text-slate-400">${dateStr}</p>
+                            </div>
+                        </div>
+                        <span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">${job.status}</span>
+                    </div>
+                    ${billingInfo}
+                </div>`;
+            });
+
+            historyFeed.innerHTML = html;
         };
-
-        window.closeProfileModal = function() { document.getElementById('client-profile-modal').style.display = 'none'; };
-
         // ==========================================
         // ESTIMATE ENGINE
         // ==========================================
