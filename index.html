@@ -1003,11 +1003,83 @@
         }
 
         // ==========================================
-        // INVOICE ENGINE PLACEHOLDERS
+        // INVOICE ENGINE
         // ==========================================
-        window.fetchInvoicesData = function() {
+        window.fetchInvoicesData = async function() {
             const feed = document.getElementById('invoices-feed');
-            feed.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">Invoice fetch logic migrating to Supabase...</div>';
+            feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
+
+            // 1. Fetch invoices and pull the job name using Supabase's automatic relational mapping
+            const { data: invoices, error } = await db
+                .from('invoices')
+                .select('*, jobs(name)')
+                .eq('company_id', COMPANY_ID)
+                .order('created_at', { ascending: false });
+
+            if (error) { 
+                feed.innerHTML = `<p class="text-red-500 text-center py-8">Error: ${error.message}</p>`; 
+                return; 
+            }
+
+            let unpaidTotal = 0;
+            let paidTotal = 0;
+            let html = '';
+
+            // 2. Handle empty state
+            if (!invoices || invoices.length === 0) {
+                html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
+            } else {
+                // 3. Loop through invoices, build the UI, and run the math
+                invoices.forEach(inv => {
+                    const amount = parseFloat(inv.amount) || 0;
+                    // Supabase returns related data in an object. We grab the job name here:
+                    const jobName = inv.jobs ? inv.jobs.name : 'Service Call'; 
+                    const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                    if (inv.status === 'Unpaid') unpaidTotal += amount;
+                    if (inv.status === 'Paid') paidTotal += amount;
+
+                    const isPaid = inv.status === 'Paid';
+                    const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
+                    const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
+                    
+                    // Show a "Paid" badge or an interactive "Mark Paid" button
+                    const actionBtn = isPaid 
+                        ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
+                        : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">Mark Paid</button>`;
+
+                    html += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex justify-between items-center transition hover:shadow-md">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
+                            <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
+                            <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
+                        </div>
+                        <div class="text-right flex flex-col items-end justify-between h-full">
+                            <span class="text-2xl font-black text-slate-800 mb-2">$${amount.toFixed(2)}</span>
+                            ${actionBtn}
+                        </div>
+                    </div>`;
+                });
+            }
+
+            // 4. Update the KPI displays at the top
+            document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
+            document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
+            feed.innerHTML = html;
+        };
+
+        window.markAsPaid = async function(invoiceId) {
+            // Update the status in the database
+            const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
+            
+            if (error) {
+                alert("Error updating billing: " + error.message);
+                return;
+            }
+            
+            // Instantly refresh the screen to move the money from Unpaid to Paid
+            fetchInvoicesData();
         };
 
         window.markAsPaid = function(row) {
