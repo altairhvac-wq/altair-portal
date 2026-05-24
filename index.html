@@ -25,58 +25,59 @@
         .app-section.active { display: block; }
         .line-item-scroll::-webkit-scrollbar { width: 6px; }
         .line-item-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden text-slate-800 antialiased relative">
 
-    <nav class="w-24 bg-slate-800 flex flex-col items-center py-6 space-y-8 shadow-xl z-20">
-        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center font-bold text-white text-xl shadow-md mb-4">A</div>
+    <nav class="w-16 md:w-24 flex-shrink-0 bg-slate-800 flex flex-col items-center py-6 space-y-6 md:space-y-8 shadow-xl z-20 overflow-y-auto">
+        <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-500 rounded-full flex items-center justify-center font-bold text-white text-lg md:text-xl shadow-md mb-2 md:mb-4">A</div>
         
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-4">
-            <svg class="w-7 h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            <span class="text-[10px] font-bold tracking-wider">HOME</span>
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-3 md:py-4">
+            <svg class="w-6 h-6 md:w-7 md:h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <span class="hidden md:block text-[10px] font-bold tracking-wider">HOME</span>
         </button>
 
-        <button onclick="switchTab('dispatch')" id="nav-dispatch" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-4">
-            <svg class="w-7 h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span class="text-[10px] font-bold tracking-wider">DISPATCH</span>
+        <button onclick="switchTab('dispatch')" id="nav-dispatch" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-3 md:py-4">
+            <svg class="w-6 h-6 md:w-7 md:h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span class="hidden md:block text-[10px] font-bold tracking-wider">DISPATCH</span>
         </button>
 
-        <button onclick="switchTab('history')" id="nav-history" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-4">
-            <svg class="w-7 h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span class="text-[10px] font-bold tracking-wider">HISTORY</span>
+        <button onclick="switchTab('history')" id="nav-history" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-3 md:py-4">
+            <svg class="w-6 h-6 md:w-7 md:h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="hidden md:block text-[10px] font-bold tracking-wider">HISTORY</span>
         </button>
 
-        <button onclick="switchTab('estimates')" id="nav-estimates" class="nav-btn w-full flex flex-col items-center bg-cyan-500 text-white py-4 shadow-lg border-r-4 border-white transition relative">
-            <svg class="w-7 h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            <span class="text-[10px] font-bold tracking-wider">ESTIMATES</span>
+        <button onclick="switchTab('estimates')" id="nav-estimates" class="nav-btn w-full flex flex-col items-center bg-cyan-500 text-white py-3 md:py-4 shadow-lg border-r-4 border-white transition relative">
+            <svg class="w-6 h-6 md:w-7 md:h-7 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            <span class="hidden md:block text-[10px] font-bold tracking-wider">ESTIMATES</span>
         </button>
 
-        <button onclick="switchTab('invoices')" id="nav-invoices" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-4">
-            <svg class="w-7 h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span class="text-[10px] font-bold tracking-wider">INVOICE</span>
+        <button onclick="switchTab('invoices')" id="nav-invoices" class="nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-3 md:py-4">
+            <svg class="w-6 h-6 md:w-7 md:h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="hidden md:block text-[10px] font-bold tracking-wider">INVOICE</span>
         </button>
     </nav>
 
-    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50 relative z-10">
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50 relative z-10 w-full">
         
         <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shadow-sm z-10">
-            <h2 id="header-title" class="text-xl font-bold text-slate-700">Estimates</h2>
+            <h2 id="header-title" class="text-xl font-bold text-slate-700">Command Center</h2>
             <div class="flex items-center space-x-4">
-                <span id="currentDate" class="text-sm font-semibold text-slate-400"></span>
-                <button onclick="openEstimateModal()" class="px-4 py-2 text-cyan-500 font-bold text-sm border-2 border-cyan-500 rounded-full hover:bg-cyan-50 transition shadow-sm">ADD ESTIMATE</button>
+                <span id="currentDate" class="text-sm font-semibold text-slate-400 hidden sm:block"></span>
+                <button onclick="openEstimateModal()" class="px-4 py-2 text-cyan-500 font-bold text-sm border-2 border-cyan-500 rounded-full hover:bg-cyan-50 transition shadow-sm whitespace-nowrap">ADD ESTIMATE</button>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6">
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-safe">
             
-            <section id="view-dashboard" class="app-section max-w-4xl mx-auto">
+            <section id="view-dashboard" class="app-section active max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-slate-800">Command Center</h1>
-                    <button id="test-pdf-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition">Test PDF Engine</button>
+                    <button id="test-pdf-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition text-sm">Test PDF Engine</button>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 border-l-4 border-l-blue-500">
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Active Jobs</div>
                         <div id="kpi-active-jobs" class="text-3xl font-black text-slate-800">...</div>
@@ -99,7 +100,7 @@
             <section id="view-dispatch" class="app-section max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-slate-800">Live Dispatch Board</h1>
-                    <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition" onclick="fetchLiveAppEngineData()">Refresh Data</button>
+                    <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition" onclick="fetchLiveAppEngineData()">Refresh</button>
                 </div>
                 <div id="dispatch-feed" class="space-y-4">
                     <p class="text-slate-400 italic">Syncing with Altair server...</p>
@@ -109,9 +110,10 @@
             <section id="view-history" class="app-section max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-slate-800">Client Directory</h1>
-                    <button onclick="openCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        New Customer
+                    <button onclick="openCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span class="hidden sm:inline">New Customer</span>
+                        <span class="sm:hidden">New</span>
                     </button>
                 </div>
                 
@@ -119,7 +121,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" id="directory-search" onkeyup="window.filterDirectory()" placeholder="Search by name, phone, or address..." class="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 shadow-sm transition">
+                    <input type="text" id="directory-search" onkeyup="window.filterDirectory()" placeholder="Search clients..." class="w-full border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 shadow-sm transition text-sm sm:text-base">
                 </div>
 
                 <div id="directory-feed" class="space-y-3">
@@ -127,7 +129,7 @@
                 </div>
             </section>
 
-            <section id="view-estimates" class="app-section active max-w-3xl mx-auto space-y-4">
+            <section id="view-estimates" class="app-section max-w-3xl mx-auto space-y-4">
                 <div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">
                     Click "ADD ESTIMATE" to generate a new proposal.
                 </div>
@@ -135,11 +137,11 @@
             
             <section id="view-invoices" class="app-section max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-slate-800">Billing & Receivables</h1>
-                    <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition" onclick="fetchInvoicesData()">Refresh List</button>
+                    <h1 class="text-2xl font-bold text-slate-800">Billing</h1>
+                    <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition" onclick="fetchInvoicesData()">Refresh</button>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 border-l-4 border-l-yellow-400">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Unpaid / Sent</div>
                         <div id="kpi-unpaid" class="text-3xl font-black text-slate-800">$0.00</div>
@@ -164,7 +166,7 @@
                 <button onclick="closeEstimateModal()" class="text-slate-400 hover:text-white transition text-xl">✖</button>
             </div>
             
-            <div class="p-6 space-y-5">
+            <div class="p-4 sm:p-6 space-y-5">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Select Customer</label>
                     <div class="relative">
@@ -192,7 +194,7 @@
 
                 <div class="border-t border-slate-200 pt-4 flex justify-between items-center bg-slate-50 p-4 rounded-lg">
                     <span class="text-slate-500 font-bold uppercase tracking-wider text-sm">Estimated Total</span>
-                    <span class="text-3xl font-black text-slate-800">$<span id="est-total-display">0.00</span></span>
+                    <span class="text-2xl sm:text-3xl font-black text-slate-800">$<span id="est-total-display">0.00</span></span>
                 </div>
 
                 <button onclick="submitEstimate()" id="btn-submit-est" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg">
@@ -208,8 +210,8 @@
                 <h3 class="text-white font-bold text-lg">Register New Customer</h3>
                 <button onclick="closeCustomerModal()" class="text-blue-200 hover:text-white transition text-xl">✖</button>
             </div>
-            <div class="p-6 space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 sm:p-6 space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">First Name</label>
                         <input type="text" id="cust-first" class="w-full border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="First">
@@ -247,7 +249,7 @@
                 </h3>
                 <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white transition text-2xl leading-none">&times;</button>
             </div>
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <div class="mb-6 pb-6 border-b border-slate-200" id="profile-header"></div>
                 <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-4 flex items-center">Service Timeline</h4>
                 <div id="profile-history-feed" class="space-y-3 max-h-96 overflow-y-auto pr-2 line-item-scroll">
@@ -266,7 +268,7 @@
                 <button onclick="closeJobModal()" class="text-blue-200 hover:text-white transition text-2xl leading-none">&times;</button>
             </div>
             
-            <div class="p-6 space-y-5">
+            <div class="p-4 sm:p-6 space-y-5">
                 <input type="hidden" id="job-action-row">
                 <h2 id="job-action-title" class="text-2xl font-black text-slate-800 border-b border-slate-100 pb-4">Client Name</h2>
 
@@ -285,7 +287,7 @@
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span class="text-sm font-bold text-slate-700 uppercase tracking-wider">Closeout Details</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Hours</label>
                             <input type="number" id="closeout-hours" step="0.5" class="w-full border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-green-500" placeholder="e.g. 2.5">
@@ -305,7 +307,7 @@
                     </div>
                     <div class="mt-4 border-t border-slate-200 pt-4">
                         <div class="flex justify-between items-end mb-2">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Parts & Materials Used</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide">Parts Used</label>
                             <button type="button" onclick="addCloseoutPart()" class="text-blue-600 hover:text-blue-800 text-xs font-bold flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 Add Part
@@ -344,7 +346,6 @@
         // UI HELPERS & NAVIGATION
         // ==========================================
         
-        // Touch-safe modal closing (prevents mobile keyboard from closing popups)
         window.addEventListener('mousedown', function(event) {
             if (event.target.id === 'estimate-modal') closeEstimateModal();
             if (event.target.id === 'customer-modal') closeCustomerModal();
@@ -371,11 +372,11 @@
                 document.getElementById('header-title').innerText = titles[tabName];
 
                 document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.className = "nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-4";
+                    btn.className = "nav-btn w-full flex flex-col items-center text-slate-400 hover:text-white transition group py-3 md:py-4";
                 });
                 const activeBtn = document.getElementById('nav-' + tabName);
                 if (activeBtn) {
-                    activeBtn.className = "nav-btn w-full flex flex-col items-center bg-cyan-500 text-white py-4 shadow-lg border-r-4 border-white transition relative";
+                    activeBtn.className = "nav-btn w-full flex flex-col items-center bg-cyan-500 text-white py-3 md:py-4 shadow-lg border-r-4 border-white transition relative";
                 }
             } catch (err) { console.error(err); }
         }
@@ -408,663 +409,4 @@
                             body: [
                                 [ { text: 'Description', style: 'tableHeader' }, { text: 'Qty', style: 'tableHeader', alignment: 'center' }, { text: 'Price', style: 'tableHeader', alignment: 'right' }, { text: 'Total', style: 'tableHeader', alignment: 'right' } ],
                                 ['Diagnostic Fee', { text: '1', alignment: 'center' }, { text: '$89.00', alignment: 'right' }, { text: '$89.00', alignment: 'right' }],
-                                ['Capacitor Replacement', { text: '1', alignment: 'center' }, { text: '$185.00', alignment: 'right' }, { text: '$185.00', alignment: 'right' }],
-                                ['Labor (Hours)', { text: '1.5', alignment: 'center' }, { text: '$120.00', alignment: 'right' }, { text: '$180.00', alignment: 'right' }]
-                            ]
-                        },
-                        layout: 'lightHorizontalLines' 
-                    },
-                    {
-                        columns: [
-                            { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
-                            { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: '$454.00', bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
-                        ]
-                    }
-                ],
-                styles: {
-                    brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
-                    invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
-                    tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
-                    invoiceTable: { margin: [0, 5, 0, 15] }
-                },
-                defaultStyle: { columnGap: 20 }
-            };
-            pdfMake.createPdf(docDefinition).open();
-        };
-
-        // ==========================================
-        // CLIENT DIRECTORY ENGINE
-        // ==========================================
-        async function fetchDirectoryData() {
-            document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Syncing with Supabase...</p>';
-            
-            const { data: customers, error } = await db
-                .from('customers')
-                .select('*')
-                .eq('company_id', COMPANY_ID)
-                .order('last_name', { ascending: true });
-
-            if (error) { console.error("DB Error:", error); return; }
-            
-            globalCustomerDirectory = customers.map(c => ({
-                id: c.id,
-                name: `${c.first_name} ${c.last_name}`,
-                phone: c.phone || 'No Phone',
-                address: c.address || 'No Address'
-            }));
-
-            document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Type 2 or more characters to search your client database...</p>';
-        }
-
-        window.renderDirectoryList = function(customers) {
-            const feed = document.getElementById('directory-feed');
-            if (!feed) return; 
-
-            if (customers.length === 0) {
-                feed.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No customers found. Click New Customer to start!</div>';
-                return;
-            }
-            
-            let html = '';
-            customers.forEach(c => {
-                html += `
-                <div onclick="window.showProfile('${c.id}')" class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-400 transition cursor-pointer flex justify-between items-center group">
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-lg group-hover:text-blue-600 transition">${c.name}</h3>
-                        <p class="text-sm text-slate-500 mt-1 flex items-center">
-                            <svg class="w-4 h-4 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> 
-                            ${c.address}
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full inline-block">${c.phone}</p>
-                        <p class="text-xs text-slate-400 mt-2 font-mono">ID: ${c.id.substring(0,8)}...</p>
-                    </div>
-                </div>`;
-            });
-            feed.innerHTML = html;
-        };
-
-        window.filterDirectory = function() {
-            const searchTerm = document.getElementById('directory-search').value.toLowerCase();
-            const feed = document.getElementById('directory-feed');
-            
-            if (searchTerm.length < 2) {
-                feed.innerHTML = '<p class="text-slate-400 text-center py-8">Type 2 or more characters to search your client database...</p>';
-                return;
-            }
-
-            const filteredCustomers = globalCustomerDirectory.filter(c => {
-                return c.name.toLowerCase().includes(searchTerm) || 
-                       c.phone.toLowerCase().includes(searchTerm) || 
-                       c.address.toLowerCase().includes(searchTerm);
-            });
-            renderDirectoryList(filteredCustomers); 
-        };
-
-        function openCustomerModal() { document.getElementById('customer-modal').style.display = 'flex'; }
-        function closeCustomerModal() {
-            document.getElementById('customer-modal').style.display = 'none'; 
-            document.getElementById('cust-first').value = ''; document.getElementById('cust-last').value = '';
-            document.getElementById('cust-phone').value = ''; document.getElementById('cust-email').value = '';
-            document.getElementById('cust-address').value = '';
-            document.getElementById('btn-submit-cust').innerText = 'Save Customer Profile';
-            document.getElementById('btn-submit-cust').className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition mt-4";
-        }
-
-        async function submitCustomer() {
-            const first = document.getElementById('cust-first').value; 
-            const last = document.getElementById('cust-last').value;
-            const phone = document.getElementById('cust-phone').value; 
-            const email = document.getElementById('cust-email').value;
-            const address = document.getElementById('cust-address').value; 
-            const btn = document.getElementById('btn-submit-cust');
-            
-            if(!first || !last) { alert("First and Last name are required."); return; }
-            
-            btn.innerText = "Syncing with Supabase..."; 
-            btn.classList.replace('bg-blue-600', 'bg-slate-400'); 
-            btn.classList.add('cursor-not-allowed');
-
-            const { error } = await db.from('customers').insert([{ 
-                company_id: COMPANY_ID, first_name: first, last_name: last, phone: phone, email: email, address: address 
-            }]);
-
-            if (error) {
-                alert("Database Error: " + error.message);
-                btn.innerText = "Save Customer Profile"; 
-                btn.classList.replace('bg-slate-400', 'bg-blue-600'); 
-                btn.classList.remove('cursor-not-allowed');
-            } else {
-                btn.innerText = "Profile Created!"; 
-                btn.classList.replace('bg-slate-400', 'bg-green-500');
-                fetchDirectoryData(); 
-                setTimeout(closeCustomerModal, 1500);
-            }
-        }
-
-        // ==========================================
-        // DISPATCH ENGINE
-        // ==========================================
-        async function fetchLiveAppEngineData() {
-            const { data: activeJobs, error } = await db.from('jobs').select('*').eq('company_id', COMPANY_ID).neq('status', 'Completed');
-            if (error) return;
-
-            const jobsElem = document.getElementById('kpi-active-jobs');
-            if(jobsElem) jobsElem.innerText = activeJobs.length;
-
-            const feedElem = document.getElementById('dispatch-feed');
-            if(!feedElem) return;
-
-            if (activeJobs.length === 0) {
-                feedElem.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No active jobs on the board.</div>';
-                return;
-            }
-
-            let feedHTML = '';
-            activeJobs.forEach(job => {
-                feedHTML += `
-                <div onclick="openJobModal('${job.id}', '${job.name.replace(/'/g, "\\'")}', '${job.status}')" class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-cyan-400 transition group cursor-pointer border-l-4 border-l-blue-500">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-slate-800 text-lg">${job.name}</h3>
-                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">${job.status}</span>
-                    </div>
-                    <div class="text-sm text-slate-500 space-y-2">
-                        <p>📍 ${job.address}</p>
-                        <p>📞 ${job.phone}</p>
-                        <p class="mt-2 text-blue-600 font-semibold">🔧 ${job.type}</p>
-                    </div>
-                </div>`;
-            });
-            feedElem.innerHTML = feedHTML;
-        }
-
-        window.openJobModal = function(id, name, currentStatus) {
-            document.getElementById('job-action-modal').style.display = 'flex';
-            document.getElementById('job-action-row').value = id;
-            document.getElementById('job-action-title').innerText = name;
-            
-            const select = document.getElementById('job-status-select');
-            select.value = Array.from(select.options).some(opt => opt.value === currentStatus) ? currentStatus : "Scheduled";
-            toggleCloseoutFields();
-        };
-
-        window.closeJobModal = function() {
-            document.getElementById('job-action-modal').style.display = 'none';
-            document.getElementById('btn-save-job').innerText = "Update Status";
-            document.getElementById('btn-save-job').classList.remove('cursor-not-allowed', 'opacity-70');
-            document.getElementById('closeout-hours').value = '';
-            document.getElementById('closeout-filter').value = '';
-            document.getElementById('closeout-system').value = '';
-            document.getElementById('closeout-warranty').value = '';
-            document.getElementById('closeout-parts-list').innerHTML = ''; 
-        };
-
-        window.toggleCloseoutFields = function() {
-            const status = document.getElementById('job-status-select').value;
-            const fields = document.getElementById('closeout-fields');
-            const btn = document.getElementById('btn-save-job');
-            
-            if (status === 'Completed') {
-                fields.style.display = 'block';
-                btn.innerText = "Complete Job & Send Invoice";
-                btn.className = "w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-4 text-lg";
-            } else {
-                fields.style.display = 'none';
-                btn.innerText = "Update Status";
-                btn.className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition mt-4 text-lg";
-            }
-        };
-
-        window.addCloseoutPart = function() {
-            const container = document.getElementById('closeout-parts-list');
-            const row = document.createElement('div');
-            row.className = "flex space-x-2 items-center closeout-part-item mb-2";
-            
-            let pbOptions = '<option value="">-- Select a Part --</option>';
-            globalPriceBook.forEach(item => {
-                pbOptions += `<option value="${item.name}">${item.name}</option>`;
-            });
-
-            row.innerHTML = `
-                <select class="w-2/3 border border-slate-300 rounded-lg p-2 text-sm focus:border-green-500 outline-none bg-white part-name">
-                    ${pbOptions}
-                </select>
-                <input type="number" placeholder="Qty" value="1" min="1" class="w-1/3 border border-slate-300 rounded-lg p-2 text-sm focus:border-green-500 outline-none part-qty">
-                <button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-xl">&times;</button>
-            `;
-            container.appendChild(row);
-        };
-
-        async function submitJobAction() {
-            const jobId = document.getElementById('job-action-row').value; 
-            const status = document.getElementById('job-status-select').value;
-            const btn = document.getElementById('btn-save-job');
-            
-            btn.innerText = "Updating Database...";
-            btn.classList.add('cursor-not-allowed', 'opacity-70');
-
-            if (status === 'Completed') {
-                const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
-                let partsUsed = [];
-                document.querySelectorAll('.closeout-part-item').forEach(row => {
-                    const name = row.querySelector('.part-name').value;
-                    const qty = parseInt(row.querySelector('.part-qty').value) || 0;
-                    if (name && qty > 0) partsUsed.push({ name, qty });
-                });
-
-                const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
-                if(error) { alert("Error: " + error.message); return; }
-                
-                btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg flex justify-center items-center";
-                
-                // Trigger the invoice and inventory deduction engine
-                await generateLiveInvoice(jobId, hours, partsUsed);
-
-                // Enterprise UX: Explicit confirmation checkmark state before closing
-                btn.innerHTML = `
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Job Closed Successfully
-                `;
-                btn.classList.replace('bg-emerald-500', 'bg-green-600');
-
-                // Hold the success state for 1.5s so the tech can register it, then refresh
-                setTimeout(() => { 
-                    closeJobModal(); 
-                    fetchLiveAppEngineData(); 
-                }, 1500);
-            } else {
-                const { error } = await db.from('jobs').update({ status: status }).eq('id', jobId);
-                if(error) { alert("Error: " + error.message); return; }
-                btn.innerHTML = `Status Updated!`;
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
-                setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
-            }
-        }
-
-        async function generateLiveInvoice(jobId, hours, partsUsed) {
-            const { data: jobData } = await db.from('jobs').select('*').eq('id', jobId).single();
-            if (!jobData) return;
-
-            let dynamicLineItems = [
-                [
-                    { text: 'Description', style: 'tableHeader' },
-                    { text: 'Qty', style: 'tableHeader', alignment: 'center' },
-                    { text: 'Price', style: 'tableHeader', alignment: 'right' },
-                    { text: 'Total', style: 'tableHeader', alignment: 'right' }
-                ]
-            ];
-
-            let grandTotal = 0;
-
-            if (hours > 0) {
-                const laborRate = 120.00; 
-                const laborTotal = hours * laborRate;
-                grandTotal += laborTotal;
-                
-                dynamicLineItems.push([
-                    'Labor (Hours)', 
-                    { text: hours.toString(), alignment: 'center' }, 
-                    { text: `$${laborRate.toFixed(2)}`, alignment: 'right' }, 
-                    { text: `$${laborTotal.toFixed(2)}`, alignment: 'right' }
-                ]);
-            }
-
-            partsUsed.forEach(part => {
-                const pbItem = globalPriceBook.find(item => item.name.toLowerCase() === part.name.toLowerCase());
-                const price = pbItem ? pbItem.price : 0.00; 
-                const lineTotal = part.qty * price;
-                grandTotal += lineTotal;
-
-                dynamicLineItems.push([
-                    part.name,
-                    { text: part.qty.toString(), alignment: 'center' },
-                    { text: `$${price.toFixed(2)}`, alignment: 'right' },
-                    { text: `$${lineTotal.toFixed(2)}`, alignment: 'right' }
-                ]);
-            });
-
-            const { error: invoiceError } = await db.from('invoices').insert([{
-                company_id: COMPANY_ID,
-                job_id: jobId,
-                amount: grandTotal, 
-                status: 'Unpaid'
-            }]);
-
-            if (invoiceError) console.error("Invoice Save Error:", invoiceError.message);
-
-            // Inventory Deduction Engine
-            if (partsUsed.length > 0) {
-                for (const part of partsUsed) {
-                    const { data: currentItem } = await db
-                        .from('inventory')
-                        .select('id, stock_qty')
-                        .eq('company_id', COMPANY_ID)
-                        .ilike('part_name', part.name)
-                        .single();
-
-                    if (currentItem) {
-                        const newQty = currentItem.stock_qty - part.qty;
-                        await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
-                    }
-                }
-            }
-
-            const docDefinition = {
-                content: [
-                    {
-                        columns: [
-                            { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
-                            { text: `INVOICE\n# INV-${jobId.substring(0,6).toUpperCase()}`, style: 'invoiceTitle', alignment: 'right' }
-                        ]
-                    },
-                    { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] }, 
-                    {
-                        columns: [
-                            { text: [{ text: 'From:\n', bold: true, color: '#64748b' }, 'ALTAIR Climate Control\nLayton, UT'] },
-                            { text: [{ text: 'Bill To:\n', bold: true, color: '#64748b' }, `${jobData.name}\n${jobData.address}\n${jobData.phone}`], alignment: 'right' }
-                        ],
-                        margin: [0, 0, 0, 30] 
-                    },
-                    {
-                        style: 'invoiceTable',
-                        table: { headerRows: 1, widths: ['*', 'auto', 'auto', 'auto'], body: dynamicLineItems },
-                        layout: 'lightHorizontalLines' 
-                    },
-                    {
-                        columns: [
-                            { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
-                            { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: `$${grandTotal.toFixed(2)}`, bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
-                        ]
-                    }
-                ],
-                styles: {
-                    brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
-                    invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
-                    tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
-                    invoiceTable: { margin: [0, 5, 0, 15] }
-                },
-                defaultStyle: { columnGap: 20 }
-            };
-
-            pdfMake.createPdf(docDefinition).open();
-        }
-
-       
-
-        // ==========================================
-        // CLIENT PROFILE ENGINE
-        // ==========================================
-        window.showProfile = function(custID) {
-            const m = document.getElementById('client-profile-modal');
-            m.style.display = 'flex';
-            const historyFeed = document.getElementById('profile-history-feed');
-            const header = document.getElementById('profile-header');
-            const cust = globalCustomerDirectory.find(c => c.id === custID);
-            if (cust) {
-                header.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h2 class="text-2xl font-black text-slate-800">${cust.name}</h2>
-                            <p class="text-slate-500 text-sm mt-1">${cust.address}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="inline-block bg-blue-50 border border-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm shadow-sm">${cust.phone}</span>
-                        </div>
-                    </div>
-                `;
-            }
-            historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">History sync migrating to Supabase...</p></div>';
-        };
-
-        window.closeProfileModal = function() { document.getElementById('client-profile-modal').style.display = 'none'; };
-
-        // ==========================================
-        // ESTIMATE ENGINE
-        // ==========================================
-        async function fetchPriceBook() {
-            const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
-            if (!error) globalPriceBook = data;
-        }
-
-        function openEstimateModal() { 
-            const m = document.getElementById('estimate-modal');
-            m.style.display = 'flex'; 
-            document.getElementById('est-line-items').innerHTML = '';
-            
-            const select = document.getElementById('est-customer-select');
-            let options = '<option value="">-- Choose a Customer --</option>';
-            globalCustomerDirectory.forEach(cust => {
-                options += `<option value="${cust.id}">${cust.name}</option>`;
-            });
-            select.innerHTML = options;
-            addLineItem();
-        }
-
-        function closeEstimateModal() {
-            document.getElementById('estimate-modal').style.display = 'none'; 
-            document.getElementById('btn-submit-est').innerText = 'Save to Dispatch Board';
-            document.getElementById('btn-submit-est').className = "w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl shadow-md transition mt-2 text-lg";
-            document.getElementById('est-total-display').innerText = "0.00";
-            document.getElementById('est-line-items').innerHTML = '';
-        }
-
-        window.addLineItem = function() {
-            const container = document.getElementById('est-line-items');
-            const row = document.createElement('div');
-            row.className = "flex space-x-2 items-center line-item mb-2";
-            
-            let pbOptions = '<option value="" data-price="0">-- Select Item --</option>';
-            globalPriceBook.forEach(item => {
-                pbOptions += `<option value="${item.name}" data-price="${item.price}">${item.name}</option>`;
-            });
-
-            row.innerHTML = `
-                <select onchange="autoFillPrice(this)" class="w-1/2 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none bg-white item-name">
-                    ${pbOptions}
-                </select>
-                <input type="number" placeholder="Qty" value="1" min="1" oninput="calculateEstTotal()" class="w-1/6 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-qty">
-                <input type="number" placeholder="Price" value="0.00" oninput="calculateEstTotal()" class="w-1/4 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-price">
-                <button onclick="removeLineItem(this)" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-lg">✖</button>
-            `;
-            container.appendChild(row);
-        };
-
-        window.autoFillPrice = function(selectElem) {
-            const selectedOption = selectElem.options[selectElem.selectedIndex];
-            const price = selectedOption.getAttribute('data-price');
-            const priceInput = selectElem.parentElement.querySelector('.item-price');
-            priceInput.value = parseFloat(price).toFixed(2);
-            calculateEstTotal(); 
-        };
-
-        window.removeLineItem = function(btn) {
-            btn.parentElement.remove();
-            calculateEstTotal();
-        };
-
-        window.calculateEstTotal = function() {
-            let total = 0;
-            document.querySelectorAll('.line-item').forEach(row => {
-                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                total += (qty * price);
-            });
-            document.getElementById('est-total-display').innerText = total.toFixed(2);
-        };
-
-        async function submitEstimate() {
-            const select = document.getElementById('est-customer-select');
-            if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
-            
-            const custID = select.options[select.selectedIndex].value;
-            const amount = document.getElementById('est-total-display').innerText;
-            const btn = document.getElementById('btn-submit-est');
-
-            if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
-
-            btn.innerText = "Saving to Database...";
-            btn.classList.replace('bg-cyan-500', 'bg-slate-400');
-            btn.classList.add('cursor-not-allowed');
-
-            let lineItems = [];
-            document.querySelectorAll('.line-item').forEach(row => {
-                const nameElem = row.querySelector('.item-name');
-                const name = nameElem.options[nameElem.selectedIndex].text;
-                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                if (name && qty > 0) lineItems.push({ name, qty, price });
-            });
-
-            // 1. SAVE TO ESTIMATES TABLE
-            const { error: estError } = await db.from('estimates').insert([{ 
-                company_id: COMPANY_ID, customer_id: custID, title: 'Service Estimate', amount: amount, line_items: lineItems 
-            }]);
-
-            if (estError) {
-                alert("Error: " + estError.message);
-                btn.innerText = "Save to Dispatch Board";
-                btn.classList.replace('bg-slate-400', 'bg-cyan-500');
-                btn.classList.remove('cursor-not-allowed');
-                return;
-            }
-
-            // 2. PULL CUSTOMER INFO
-            const customer = globalCustomerDirectory.find(c => c.id === custID);
-
-            // 3. PUSH A NEW TICKET TO DISPATCH BOARD
-            if (customer) {
-                const { error: jobError } = await db.from('jobs').insert([{
-                    company_id: COMPANY_ID,
-                    name: customer.name,
-                    phone: customer.phone,
-                    address: customer.address,
-                    type: 'Estimate / Proposal', 
-                    status: 'Scheduled'
-                }]);
-                
-                if (jobError) console.error("Failed to create dispatch ticket:", jobError.message);
-            }
-
-            // 4. UPDATE UI
-            btn.innerText = "Estimate Saved & Dispatched!";
-            btn.classList.replace('bg-slate-400', 'bg-green-500');
-            fetchLiveAppEngineData();
-            setTimeout(closeEstimateModal, 1500);
-        }
-
-        // ==========================================
-        // INVOICE & BILLING ENGINE
-        // ==========================================
-       window.fetchInvoicesData = async function() {
-    const feed = document.getElementById('invoices-feed');
-    feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
-
-    // Explicitly define the join to prevent PostgREST errors
-    const { data: invoices, error } = await db
-        .from('invoices')
-        .select(`
-            id, amount, status, created_at,
-            jobs ( name )
-        `)
-        .eq('company_id', COMPANY_ID)
-        .order('created_at', { ascending: false });
-
-    if (error) { 
-        console.error("Billing Sync Error:", error);
-        feed.innerHTML = `<p class="text-red-500 text-center py-8">Connection error. Check console.</p>`; 
-        return; 
-    }
-
-    let unpaidTotal = 0;
-    let paidTotal = 0;
-    let html = '';
-
-    if (!invoices || invoices.length === 0) {
-        html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
-    } else {
-        invoices.forEach(inv => {
-            const amount = parseFloat(inv.amount) || 0;
-            
-            // Defensive check: Handle cases where jobs relationship returns null or an array
-            let jobName = 'Service Call';
-            if (inv.jobs && !Array.isArray(inv.jobs)) jobName = inv.jobs.name;
-            else if (Array.isArray(inv.jobs) && inv.jobs.length > 0) jobName = inv.jobs[0].name;
-
-            const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-            if (inv.status === 'Unpaid') unpaidTotal += amount;
-            if (inv.status === 'Paid') paidTotal += amount;
-
-            const isPaid = inv.status === 'Paid';
-            const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
-            const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
-            
-            const actionBtn = isPaid 
-                ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
-                : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">Mark Paid</button>`;
-
-            html += `
-            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex justify-between items-center transition hover:shadow-md">
-                <div>
-                    <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
-                    <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
-                    <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
-                </div>
-                <div class="text-right flex flex-col items-end justify-between h-full">
-                    <span class="text-2xl font-black text-slate-800 mb-2">$${amount.toFixed(2)}</span>
-                    ${actionBtn}
-                </div>
-            </div>`;
-        });
-    }
-
-    document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
-    document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
-    feed.innerHTML = html;
-}; 
-
-        window.markAsPaid = async function(invoiceId) {
-            const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
-            if (error) { alert("Error updating billing: " + error.message); return; }
-            fetchInvoicesData();
-        };
-
-        // ==========================================
-        // INITIALIZATION
-        // ==========================================
-        window.onload = function() {
-            const dateElem = document.getElementById('currentDate');
-            if(dateElem) dateElem.textContent = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            
-            fetchLiveAppEngineData();
-            fetchDirectoryData();
-            fetchInvoicesData();
-            fetchPriceBook(); 
-        };
-
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const navDashboard = document.getElementById('nav-dashboard');
-            if (navDashboard) navDashboard.addEventListener('click', () => switchTab('dashboard'));
-
-            const navDispatch = document.getElementById('nav-dispatch');
-            if (navDispatch) navDispatch.addEventListener('click', () => switchTab('dispatch'));
-
-            const navHistory = document.getElementById('nav-history');
-            if (navHistory) navHistory.addEventListener('click', () => switchTab('history'));
-
-            const navEstimates = document.getElementById('nav-estimates');
-            if (navEstimates) navEstimates.addEventListener('click', () => switchTab('estimates'));
-
-            const navInvoices = document.getElementById('nav-invoices');
-            if (navInvoices) navInvoices.addEventListener('click', () => switchTab('invoices'));
-
-            const pdfTestBtn = document.getElementById('test-pdf-btn');
-            if (pdfTestBtn) pdfTestBtn.addEventListener('click', window.testPDFEngine);
-        });
-    </script>
-</body>
-</html>
+                                ['Capacitor Replacement', { text:
