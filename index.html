@@ -11,6 +11,10 @@
     <!-- SUPABASE CLIENT -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- PDFMAKE ENGINE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+    
     <!-- CUSTOM APP ICONS -->
     <link rel="apple-touch-icon" href="https://i.postimg.cc/GhqPQBt9/Altair-Logo.png">
     <link rel="icon" sizes="192x192" href="https://i.postimg.cc/GhqPQBt9/Altair-Logo.png">
@@ -70,7 +74,11 @@
         <div class="flex-1 overflow-y-auto p-6">
             
             <section id="view-dashboard" class="app-section max-w-4xl mx-auto">
-                <h1 class="text-2xl font-bold mb-6 text-slate-800">Command Center</h1>
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-slate-800">Command Center</h1>
+                    <button id="test-pdf-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition">Test PDF Engine</button>
+                </div>
+                
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-100 border-l-4 border-l-blue-500">
                         <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Active Jobs</div>
@@ -377,6 +385,26 @@
                 }
             } catch (err) { console.error(err); }
         }
+
+        // ==========================================
+        // PDF INVOICE ENGINE TEST
+        // ==========================================
+        window.testPDFEngine = function() {
+            const docDefinition = {
+                content: [
+                    { text: 'ALTAIR Climate Control', style: 'header' },
+                    'Invoice Engine successfully mounted. Ready for live database injection.'
+                ],
+                styles: {
+                    header: {
+                        fontSize: 24,
+                        bold: true,
+                        margin: [0, 0, 0, 10]
+                    }
+                }
+            };
+            pdfMake.createPdf(docDefinition).open();
+        };
 
         // ==========================================
         // CLIENT DIRECTORY ENGINE
@@ -777,6 +805,10 @@
 
             const navInvoices = document.getElementById('nav-invoices');
             if (navInvoices) navInvoices.addEventListener('click', () => switchTab('invoices'));
+
+            // BIND THE PDF TEST BUTTON HERE
+            const pdfTestBtn = document.getElementById('test-pdf-btn');
+            if (pdfTestBtn) pdfTestBtn.addEventListener('click', window.testPDFEngine);
         });
     </script>
 </body>
