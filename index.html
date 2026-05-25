@@ -57,15 +57,33 @@
             <svg class="w-6 h-6 md:w-7 md:h-7 mb-1 group-hover:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span class="hidden md:block text-[10px] font-bold tracking-wider">INVOICE</span>
         </button>
+
+        <div class="grid grid-cols-2 gap-3 mb-6 px-4">
+            <button onclick="openTimecardModal()" class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex flex-col items-center justify-center shadow-sm active:scale-95 transition-transform">
+                <svg class="w-8 h-8 text-indigo-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-indigo-900 font-bold text-sm">Log Time</span>
+            </button>
+            <button onclick="openExpenseModal()" class="bg-rose-50 border border-rose-100 p-4 rounded-2xl flex flex-col items-center justify-center shadow-sm active:scale-95 transition-transform">
+                <svg class="w-8 h-8 text-rose-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path></svg>
+                <span class="text-rose-900 font-bold text-sm">Add Expense</span>
+            </button>
+        </div>
+
     </nav>
 
     <main class="flex-1 flex flex-col overflow-hidden bg-slate-50 relative z-10 w-full">
         
         <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center shadow-sm z-10">
             <h2 id="header-title" class="text-xl font-bold text-slate-700">Command Center</h2>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-4">
                 <span id="currentDate" class="text-sm font-semibold text-slate-400 hidden sm:block"></span>
-                <button onclick="openEstimateModal()" class="px-4 py-2 text-cyan-500 font-bold text-sm border-2 border-cyan-500 rounded-full hover:bg-cyan-50 transition shadow-sm whitespace-nowrap">ADD ESTIMATE</button>
+                <div class="flex flex-col items-end">
+                    <label for="tech-view-select" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden sm:block">Viewing As</label>
+                    <select id="tech-view-select" onchange="setCurrentTechnicianView(this.value)" class="border border-slate-300 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white focus:outline-none focus:border-blue-500 max-w-[140px] sm:max-w-none">
+                        <option value="">Dispatcher (All Jobs)</option>
+                    </select>
+                </div>
+                <button onclick="openEstimateModal()" class="px-3 sm:px-4 py-2 text-cyan-500 font-bold text-xs sm:text-sm border-2 border-cyan-500 rounded-full hover:bg-cyan-50 transition shadow-sm whitespace-nowrap">ADD ESTIMATE</button>
             </div>
         </header>
 
@@ -99,7 +117,10 @@
 
             <section id="view-dispatch" class="app-section max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-slate-800">Live Dispatch Board</h1>
+                    <div>
+                        <h1 id="dispatch-board-title" class="text-2xl font-bold text-slate-800">Live Dispatch Board</h1>
+                        <p id="tech-view-label" class="text-sm text-slate-500 mt-1">Dispatcher (All Jobs)</p>
+                    </div>
                     <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-200 transition" onclick="fetchLiveAppEngineData()">Refresh</button>
                 </div>
                 <div id="dispatch-feed" class="space-y-4">
@@ -107,6 +128,39 @@
                 </div>
             </section>
 
+            <section id="view-tech" class="app-section p-4 max-w-md mx-auto w-full pb-24">
+                
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 mb-6 flex items-center justify-between">
+                    <div>
+                        <h2 id="shift-status-text" class="text-xl font-black text-slate-800">Off Duty</h2>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Current Shift</p>
+                    </div>
+                    <button id="btn-clock-toggle" onclick="toggleShiftStatus()" class="w-16 h-16 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center transition-colors">
+                        <svg id="shift-icon" class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                    </button>
+                </div>
+            
+                <h3 class="font-bold text-slate-800 mb-3 px-2">Current Task</h3>
+                <div id="current-task-card" class="bg-white border-2 border-blue-100 rounded-2xl p-5 shadow-sm mb-6 hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <span id="ct-status-badge" class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2 py-1 rounded">Dispatched</span>
+                        <span class="text-sm font-bold text-slate-400" id="ct-type">Loading...</span>
+                    </div>
+                    <h2 id="ct-name" class="text-xl font-black text-slate-800 mb-1">Loading...</h2>
+                    <p id="ct-address" class="text-slate-500 mb-6 text-sm font-medium">Please wait...</p>
+                    
+                    <div id="ct-action-container">
+                        </div>
+                </div>
+            
+                <h3 class="font-bold text-slate-800 mb-3 px-2">Up Next</h3>
+                <div id="pending-tasks-feed" class="space-y-3">
+                    <p class="text-center text-slate-400 py-4 text-sm">Syncing dispatch board...</p>
+                </div>
+
+            </section>
+            
+            <section id="view-history" class="app-section max-w-4xl mx-auto">
             <section id="view-history" class="app-section max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-bold text-slate-800">Client Directory</h1>
@@ -163,7 +217,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-slate-800 p-5 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">Build New Estimate</h3>
-                <button onclick="closeEstimateModal()" class="text-slate-400 hover:text-white transition text-xl">✖</button>
+                <button onclick="closeEstimateModal()" class="text-slate-400 hover:text-white transition text-xl">âœ–</button>
             </div>
             
             <div class="p-4 sm:p-6 space-y-5">
@@ -208,7 +262,7 @@
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all my-8" onclick="event.stopPropagation()">
             <div class="bg-blue-600 p-5 flex justify-between items-center">
                 <h3 class="text-white font-bold text-lg">Register New Customer</h3>
-                <button onclick="closeCustomerModal()" class="text-blue-200 hover:text-white transition text-xl">✖</button>
+                <button onclick="closeCustomerModal()" class="text-blue-200 hover:text-white transition text-xl">âœ–</button>
             </div>
             <div class="p-4 sm:p-6 space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -272,6 +326,14 @@
                 <input type="hidden" id="job-action-row">
                 <h2 id="job-action-title" class="text-2xl font-black text-slate-800 border-b border-slate-100 pb-4">Client Name</h2>
 
+                <div id="job-assign-section">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Assign Technician</label>
+                    <select id="job-tech-select" class="w-full border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition appearance-none bg-white">
+                        <option value="">Unassigned</option>
+                    </select>
+                    <p class="text-[10px] text-slate-400 mt-1 italic">Assigned jobs only appear on that technician's dispatch board.</p>
+                </div>
+
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Update Status</label>
                     <select id="job-status-select" onchange="toggleCloseoutFields()" class="w-full border border-slate-300 rounded-lg p-3 text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition appearance-none bg-white">
@@ -325,23 +387,8 @@
             </div>
         </div>
     </div>
-
+    <script src="js/core/api.js"></script>
     <script>
-        // ==========================================
-        // SUPABASE INITIALIZATION
-        // ==========================================
-        const supabaseUrl = 'https://otmwvymcerqaqalipmqs.supabase.co';
-        const supabaseKey = 'sb_publishable_UtoKnZAPU9gDxD7kCGvk_A_OhKMj1ft';
-        const db = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        const COMPANY_ID = 'altair-001'; 
-
-        // ==========================================
-        // GLOBAL STATE
-        // ==========================================
-        let globalPriceBook = [];
-        let globalCustomerDirectory = []; 
-
         // ==========================================
         // UI HELPERS & NAVIGATION
         // ==========================================
@@ -434,29 +481,8 @@
         };
 
         // ==========================================
-        // CLIENT DIRECTORY ENGINE
+        // CLIENT DIRECTORY UI
         // ==========================================
-        async function fetchDirectoryData() {
-            document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Syncing with Supabase...</p>';
-            
-            const { data: customers, error } = await db
-                .from('customers')
-                .select('*')
-                .eq('company_id', COMPANY_ID)
-                .order('last_name', { ascending: true });
-
-            if (error) { console.error("DB Error:", error); return; }
-            
-            globalCustomerDirectory = customers.map(c => ({
-                id: c.id,
-                name: `${c.first_name} ${c.last_name}`,
-                phone: c.phone || 'No Phone',
-                address: c.address || 'No Address'
-            }));
-
-            document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Type 2 or more characters to search your client database...</p>';
-        }
-
         window.renderDirectoryList = function(customers) {
             const feed = document.getElementById('directory-feed');
             if (!feed) return; 
@@ -495,7 +521,7 @@
                 return;
             }
 
-            const filteredCustomers = globalCustomerDirectory.filter(c => {
+            const filteredCustomers = window.globalCustomerDirectory.filter(c => {
                 return c.name.toLowerCase().includes(searchTerm) || 
                        c.phone.toLowerCase().includes(searchTerm) || 
                        c.address.toLowerCase().includes(searchTerm);
@@ -513,78 +539,25 @@
             document.getElementById('btn-submit-cust').className = "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-md transition mt-4";
         }
 
-        async function submitCustomer() {
-            const first = document.getElementById('cust-first').value; 
-            const last = document.getElementById('cust-last').value;
-            const phone = document.getElementById('cust-phone').value; 
-            const email = document.getElementById('cust-email').value;
-            const address = document.getElementById('cust-address').value; 
-            const btn = document.getElementById('btn-submit-cust');
-            
-            if(!first || !last) { alert("First and Last name are required."); return; }
-            
-            btn.innerText = "Syncing with Supabase..."; 
-            btn.classList.replace('bg-blue-600', 'bg-slate-400'); 
-            btn.classList.add('cursor-not-allowed');
-
-            const { error } = await db.from('customers').insert([{ 
-                company_id: COMPANY_ID, first_name: first, last_name: last, phone: phone, email: email, address: address 
-            }]);
-
-            if (error) {
-                alert("Database Error: " + error.message);
-                btn.innerText = "Save Customer Profile"; 
-                btn.classList.replace('bg-slate-400', 'bg-blue-600'); 
-                btn.classList.remove('cursor-not-allowed');
-            } else {
-                btn.innerText = "Profile Created!"; 
-                btn.classList.replace('bg-slate-400', 'bg-green-500');
-                fetchDirectoryData(); 
-                setTimeout(closeCustomerModal, 1500);
-            }
+        function closeProfileModal() {
+            document.getElementById('client-profile-modal').style.display = 'none';
         }
 
         // ==========================================
-        // DISPATCH ENGINE
+        // DISPATCH UI
         // ==========================================
-        async function fetchLiveAppEngineData() {
-            const { data: activeJobs, error } = await db.from('jobs').select('*').eq('company_id', COMPANY_ID).neq('status', 'Completed');
-            if (error) return;
-
-            const jobsElem = document.getElementById('kpi-active-jobs');
-            if(jobsElem) jobsElem.innerText = activeJobs.length;
-
-            const feedElem = document.getElementById('dispatch-feed');
-            if(!feedElem) return;
-
-            if (activeJobs.length === 0) {
-                feedElem.innerHTML = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No active jobs on the board.</div>';
-                return;
-            }
-
-            let feedHTML = '';
-            activeJobs.forEach(job => {
-                feedHTML += `
-                <div onclick="openJobModal('${job.id}', '${job.name.replace(/'/g, "\\'")}', '${job.status}')" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-cyan-400 transition group cursor-pointer border-l-4 border-l-blue-500">
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-slate-800 text-lg sm:text-xl">${job.name}</h3>
-                        <span class="bg-slate-100 text-slate-600 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap ml-2">${job.status}</span>
-                    </div>
-                    <div class="text-xs sm:text-sm text-slate-500 space-y-2">
-                        <p class="truncate">📍 ${job.address}</p>
-                        <p>📞 ${job.phone}</p>
-                        <p class="mt-2 text-blue-600 font-semibold">🔧 ${job.type}</p>
-                    </div>
-                </div>`;
-            });
-            feedElem.innerHTML = feedHTML;
-        }
-
-        window.openJobModal = function(id, name, currentStatus) {
+        window.openJobModal = function(id, name, currentStatus, assignedTechId) {
             document.getElementById('job-action-modal').style.display = 'flex';
             document.getElementById('job-action-row').value = id;
             document.getElementById('job-action-title').innerText = name;
-            
+
+            const assignSection = document.getElementById('job-assign-section');
+            const isFieldTechView = !!window.getCurrentTechnicianId();
+            if (assignSection) assignSection.style.display = isFieldTechView ? 'none' : 'block';
+
+            const techSelect = document.getElementById('job-tech-select');
+            if (techSelect) techSelect.value = assignedTechId || '';
+
             const select = document.getElementById('job-status-select');
             select.value = Array.from(select.options).some(opt => opt.value === currentStatus) ? currentStatus : "Scheduled";
             toggleCloseoutFields();
@@ -599,7 +572,9 @@
             document.getElementById('closeout-filter').value = '';
             document.getElementById('closeout-system').value = '';
             document.getElementById('closeout-warranty').value = '';
-            document.getElementById('closeout-parts-list').innerHTML = ''; 
+            document.getElementById('closeout-parts-list').innerHTML = '';
+            const techSelect = document.getElementById('job-tech-select');
+            if (techSelect) techSelect.value = '';
         };
 
         window.toggleCloseoutFields = function() {
@@ -624,7 +599,7 @@
             row.className = "flex space-x-2 items-center closeout-part-item mb-2";
             
             let pbOptions = '<option value="">-- Select a Part --</option>';
-            globalPriceBook.forEach(item => {
+            window.globalPriceBook.forEach(item => {
                 pbOptions += `<option value="${item.name}">${item.name}</option>`;
             });
 
@@ -638,271 +613,17 @@
             container.appendChild(row);
         };
 
-        async function submitJobAction() {
-            const jobId = document.getElementById('job-action-row').value; 
-            const status = document.getElementById('job-status-select').value;
-            const btn = document.getElementById('btn-save-job');
-            
-            btn.innerText = "Updating Database...";
-            btn.classList.add('cursor-not-allowed', 'opacity-70');
-
-            if (status === 'Completed') {
-                const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
-                let partsUsed = [];
-                document.querySelectorAll('.closeout-part-item').forEach(row => {
-                    const name = row.querySelector('.part-name').value;
-                    const qty = parseInt(row.querySelector('.part-qty').value) || 0;
-                    if (name && qty > 0) partsUsed.push({ name, qty });
-                });
-
-                const { error } = await db.from('jobs').update({ status: 'Completed', closed_at: new Date() }).eq('id', jobId);
-                if(error) { alert("Error: " + error.message); return; }
-                
-                btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-sm sm:text-lg flex justify-center items-center";
-                
-                // Trigger the invoice and inventory deduction engine
-                await generateLiveInvoice(jobId, hours, partsUsed);
-
-                // Enterprise UX: Explicit confirmation checkmark state before closing
-                btn.innerHTML = `
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Job Closed Successfully
-                `;
-                btn.classList.replace('bg-emerald-500', 'bg-green-600');
-
-                // Hold the success state for 1.5s so the tech can register it, then refresh
-                setTimeout(() => { 
-                    closeJobModal(); 
-                    fetchLiveAppEngineData(); 
-                }, 1500);
-            } else {
-                const { error } = await db.from('jobs').update({ status: status }).eq('id', jobId);
-                if(error) { alert("Error: " + error.message); return; }
-                btn.innerHTML = `Status Updated!`;
-                btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
-                setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
-            }
-        }
-
-        async function generateLiveInvoice(jobId, hours, partsUsed) {
-            const { data: jobData } = await db.from('jobs').select('*').eq('id', jobId).single();
-            if (!jobData) return;
-
-            let dynamicLineItems = [
-                [
-                    { text: 'Description', style: 'tableHeader' },
-                    { text: 'Qty', style: 'tableHeader', alignment: 'center' },
-                    { text: 'Price', style: 'tableHeader', alignment: 'right' },
-                    { text: 'Total', style: 'tableHeader', alignment: 'right' }
-                ]
-            ];
-
-            let grandTotal = 0;
-
-            if (hours > 0) {
-                const laborRate = 120.00; 
-                const laborTotal = hours * laborRate;
-                grandTotal += laborTotal;
-                
-                dynamicLineItems.push([
-                    'Labor (Hours)', 
-                    { text: hours.toString(), alignment: 'center' }, 
-                    { text: `$${laborRate.toFixed(2)}`, alignment: 'right' }, 
-                    { text: `$${laborTotal.toFixed(2)}`, alignment: 'right' }
-                ]);
-            }
-
-            partsUsed.forEach(part => {
-                const pbItem = globalPriceBook.find(item => item.name.toLowerCase() === part.name.toLowerCase());
-                const price = pbItem ? pbItem.price : 0.00; 
-                const lineTotal = part.qty * price;
-                grandTotal += lineTotal;
-
-                dynamicLineItems.push([
-                    part.name,
-                    { text: part.qty.toString(), alignment: 'center' },
-                    { text: `$${price.toFixed(2)}`, alignment: 'right' },
-                    { text: `$${lineTotal.toFixed(2)}`, alignment: 'right' }
-                ]);
-            });
-
-            const { error: invoiceError } = await db.from('invoices').insert([{
-                company_id: COMPANY_ID,
-                job_id: jobId,
-                amount: grandTotal, 
-                status: 'Unpaid'
-            }]);
-
-            if (invoiceError) console.error("Invoice Save Error:", invoiceError.message);
-
-            if (partsUsed.length > 0) {
-                for (const part of partsUsed) {
-                    const { data: currentItem } = await db
-                        .from('inventory')
-                        .select('id, stock_qty')
-                        .eq('company_id', COMPANY_ID)
-                        .ilike('part_name', part.name)
-                        .single();
-
-                    if (currentItem) {
-                        const newQty = currentItem.stock_qty - part.qty;
-                        await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
-                    }
-                }
-            }
-
-            const docDefinition = {
-                content: [
-                    {
-                        columns: [
-                            { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
-                            { text: `INVOICE\n# INV-${jobId.substring(0,6).toUpperCase()}`, style: 'invoiceTitle', alignment: 'right' }
-                        ]
-                    },
-                    { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] }, 
-                    {
-                        columns: [
-                            { text: [{ text: 'From:\n', bold: true, color: '#64748b' }, 'ALTAIR Climate Control\nLayton, UT'] },
-                            { text: [{ text: 'Bill To:\n', bold: true, color: '#64748b' }, `${jobData.name}\n${jobData.address}\n${jobData.phone}`], alignment: 'right' }
-                        ],
-                        margin: [0, 0, 0, 30] 
-                    },
-                    {
-                        style: 'invoiceTable',
-                        table: { headerRows: 1, widths: ['*', 'auto', 'auto', 'auto'], body: dynamicLineItems },
-                        layout: 'lightHorizontalLines' 
-                    },
-                    {
-                        columns: [
-                            { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
-                            { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: `$${grandTotal.toFixed(2)}`, bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
-                        ]
-                    }
-                ],
-                styles: {
-                    brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
-                    invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
-                    tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
-                    invoiceTable: { margin: [0, 5, 0, 15] }
-                },
-                defaultStyle: { columnGap: 20 }
-            };
-
-            pdfMake.createPdf(docDefinition).open();
-        }
-
-       // ==========================================
-        // CLIENT PROFILE ENGINE
         // ==========================================
-        window.showProfile = async function(custID) {
-            const m = document.getElementById('client-profile-modal');
-            m.style.display = 'flex';
-            const historyFeed = document.getElementById('profile-history-feed');
-            const header = document.getElementById('profile-header');
-            
-            // Find the customer in our local directory
-            const cust = globalCustomerDirectory.find(c => c.id === custID);
-            if (!cust) return;
-
-            // Render the Header
-            header.innerHTML = `
-                <div class="flex flex-col sm:flex-row justify-between sm:items-start">
-                    <div class="mb-2 sm:mb-0">
-                        <h2 class="text-2xl font-black text-slate-800">${cust.name}</h2>
-                        <p class="text-slate-500 text-sm mt-1">${cust.address}</p>
-                    </div>
-                    <div class="sm:text-right">
-                        <span class="inline-block bg-blue-50 border border-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm shadow-sm">${cust.phone}</span>
-                    </div>
-                </div>
-            `;
-
-            // Show a loading state
-            historyFeed.innerHTML = '<p class="text-slate-400 text-center py-8">Retrieving service history...</p>';
-
-            // Fetch past jobs AND their related invoices using a Supabase relational join
-            const { data: historyData, error } = await db
-                .from('jobs')
-                .select(`
-                    id, type, status, created_at,
-                    invoices ( amount, status, id )
-                `)
-                .eq('company_id', COMPANY_ID)
-                .eq('name', cust.name) // Match the job to the customer
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                historyFeed.innerHTML = `<p class="text-red-500 text-center py-4">Error fetching history: ${error.message}</p>`;
-                return;
-            }
-
-            if (!historyData || historyData.length === 0) {
-                historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">No previous service history found.</p></div>';
-                return;
-            }
-
-            // Render the chronological timeline
-            let html = '';
-            historyData.forEach(job => {
-                const dateStr = new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const isCompleted = job.status === 'Completed';
-                
-                // Dynamic icon based on job status
-                const statusIcon = isCompleted 
-                    ? `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                    : `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-                
-                // Extract invoice data if it exists for this job
-                let billingInfo = '';
-                if (job.invoices && job.invoices.length > 0) {
-                    // Handle array return from PostgREST join
-                    const inv = Array.isArray(job.invoices) ? job.invoices[0] : job.invoices;
-                    const invColor = inv.status === 'Paid' ? 'text-green-600' : 'text-yellow-600';
-                    billingInfo = `
-                        <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-sm">
-                            <span class="text-slate-500">Invoice #${inv.id.substring(0,6).toUpperCase()}</span>
-                            <span class="font-bold ${invColor}">$${parseFloat(inv.amount).toFixed(2)} (${inv.status})</span>
-                        </div>
-                    `;
-                }
-
-                html += `
-                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-3 hover:shadow-md transition">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center space-x-3">
-                            ${statusIcon}
-                            <div>
-                                <h4 class="font-bold text-slate-800">${job.type || 'Service Call'}</h4>
-                                <p class="text-xs text-slate-400">${dateStr}</p>
-                            </div>
-                        </div>
-                        <span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">${job.status}</span>
-                    </div>
-                    ${billingInfo}
-                </div>`;
-            });
-
-            historyFeed.innerHTML = html;
-        };
+        // ESTIMATE UI
         // ==========================================
-        // ESTIMATE ENGINE
-        // ==========================================
-        async function fetchPriceBook() {
-            const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
-            if (!error) globalPriceBook = data;
-        }
-
-        function openEstimateModal() { 
+        function openEstimateModal() {
             const m = document.getElementById('estimate-modal');
             m.style.display = 'flex'; 
             document.getElementById('est-line-items').innerHTML = '';
             
             const select = document.getElementById('est-customer-select');
             let options = '<option value="">-- Choose a Customer --</option>';
-            globalCustomerDirectory.forEach(cust => {
+            window.globalCustomerDirectory.forEach(cust => {
                 options += `<option value="${cust.id}">${cust.name}</option>`;
             });
             select.innerHTML = options;
@@ -923,7 +644,7 @@
             row.className = "flex space-x-2 items-center line-item mb-2";
             
             let pbOptions = '<option value="" data-price="0">-- Select Item --</option>';
-            globalPriceBook.forEach(item => {
+            window.globalPriceBook.forEach(item => {
                 pbOptions += `<option value="${item.name}" data-price="${item.price}">${item.name}</option>`;
             });
 
@@ -933,7 +654,7 @@
                 </select>
                 <input type="number" placeholder="Qty" value="1" min="1" oninput="calculateEstTotal()" class="w-1/6 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-qty">
                 <input type="number" placeholder="Price" value="0.00" oninput="calculateEstTotal()" class="w-1/4 border border-slate-300 rounded-lg p-2 text-sm focus:border-cyan-500 outline-none item-price">
-                <button onclick="removeLineItem(this)" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-lg">✖</button>
+                <button onclick="removeLineItem(this)" class="text-slate-300 hover:text-red-500 font-bold px-2 transition text-lg">âœ–</button>
             `;
             container.appendChild(row);
         };
@@ -961,137 +682,6 @@
             document.getElementById('est-total-display').innerText = total.toFixed(2);
         };
 
-        async function submitEstimate() {
-            const select = document.getElementById('est-customer-select');
-            if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
-            
-            const custID = select.options[select.selectedIndex].value;
-            const amount = document.getElementById('est-total-display').innerText;
-            const btn = document.getElementById('btn-submit-est');
-
-            if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
-
-            btn.innerText = "Saving to Database...";
-            btn.classList.replace('bg-cyan-500', 'bg-slate-400');
-            btn.classList.add('cursor-not-allowed');
-
-            let lineItems = [];
-            document.querySelectorAll('.line-item').forEach(row => {
-                const nameElem = row.querySelector('.item-name');
-                const name = nameElem.options[nameElem.selectedIndex].text;
-                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
-                const price = parseFloat(row.querySelector('.item-price').value) || 0;
-                if (name && qty > 0) lineItems.push({ name, qty, price });
-            });
-
-            const { error: estError } = await db.from('estimates').insert([{ 
-                company_id: COMPANY_ID, customer_id: custID, title: 'Service Estimate', amount: amount, line_items: lineItems 
-            }]);
-
-            if (estError) {
-                alert("Error: " + estError.message);
-                btn.innerText = "Save to Dispatch Board";
-                btn.classList.replace('bg-slate-400', 'bg-cyan-500');
-                btn.classList.remove('cursor-not-allowed');
-                return;
-            }
-
-            const customer = globalCustomerDirectory.find(c => c.id === custID);
-
-            if (customer) {
-                const { error: jobError } = await db.from('jobs').insert([{
-                    company_id: COMPANY_ID,
-                    name: customer.name,
-                    phone: customer.phone,
-                    address: customer.address,
-                    type: 'Estimate / Proposal', 
-                    status: 'Scheduled'
-                }]);
-                
-                if (jobError) console.error("Failed to create dispatch ticket:", jobError.message);
-            }
-
-            btn.innerText = "Estimate Saved & Dispatched!";
-            btn.classList.replace('bg-slate-400', 'bg-green-500');
-            fetchLiveAppEngineData();
-            setTimeout(closeEstimateModal, 1500);
-        }
-
-        // ==========================================
-        // INVOICE & BILLING ENGINE
-        // ==========================================
-        window.fetchInvoicesData = async function() {
-            const feed = document.getElementById('invoices-feed');
-            feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
-
-            const { data: invoices, error } = await db
-                .from('invoices')
-                .select(`
-                    id, amount, status, created_at,
-                    jobs ( name )
-                `)
-                .eq('company_id', COMPANY_ID)
-                .order('created_at', { ascending: false });
-
-            if (error) { 
-                console.error("Billing Sync Error:", error);
-                feed.innerHTML = `<p class="text-red-500 text-center py-8">Connection error. Check console.</p>`; 
-                return; 
-            }
-
-            let unpaidTotal = 0;
-            let paidTotal = 0;
-            let html = '';
-
-            if (!invoices || invoices.length === 0) {
-                html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
-            } else {
-                invoices.forEach(inv => {
-                    const amount = parseFloat(inv.amount) || 0;
-                    
-                    let jobName = 'Service Call';
-                    if (inv.jobs && !Array.isArray(inv.jobs)) jobName = inv.jobs.name;
-                    else if (Array.isArray(inv.jobs) && inv.jobs.length > 0) jobName = inv.jobs[0].name;
-
-                    const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-                    if (inv.status === 'Unpaid') unpaidTotal += amount;
-                    if (inv.status === 'Paid') paidTotal += amount;
-
-                    const isPaid = inv.status === 'Paid';
-                    const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
-                    const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
-                    
-                    const actionBtn = isPaid 
-                        ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>` 
-                        : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition whitespace-nowrap">Mark Paid</button>`;
-
-                    html += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex flex-col sm:flex-row justify-between sm:items-center transition hover:shadow-md">
-                        <div class="mb-3 sm:mb-0">
-                            <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
-                            <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
-                            <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
-                        </div>
-                        <div class="sm:text-right flex flex-row sm:flex-col items-center sm:items-end justify-between sm:h-full">
-                            <span class="text-2xl font-black text-slate-800 sm:mb-2">$${amount.toFixed(2)}</span>
-                            ${actionBtn}
-                        </div>
-                    </div>`;
-                });
-            }
-
-            document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
-            document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
-            feed.innerHTML = html;
-        }; 
-
-        window.markAsPaid = async function(invoiceId) {
-            const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
-            if (error) { alert("Error updating billing: " + error.message); return; }
-            fetchInvoicesData();
-        };
-
         // ==========================================
         // INITIALIZATION
         // ==========================================
@@ -1102,7 +692,8 @@
             fetchLiveAppEngineData();
             fetchDirectoryData();
             fetchInvoicesData();
-            fetchPriceBook(); 
+            fetchPriceBook();
+            fetchTechnicians();
         };
 
         window.addEventListener('DOMContentLoaded', (event) => {
@@ -1125,5 +716,1138 @@
             if (pdfTestBtn) pdfTestBtn.addEventListener('click', window.testPDFEngine);
         });
     </script>
+    <div id="timecard-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex-col justify-end">
+        <div class="bg-white w-full h-[85vh] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                <h2 class="text-xl font-black text-slate-800">Log Hours</h2>
+                <button onclick="closeTimecardModal()" class="bg-slate-100 text-slate-500 p-2 rounded-full active:bg-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date</label>
+                    <input type="date" id="tc-date" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Hours</label>
+                        <input type="number" step="0.5" id="tc-hours" placeholder="e.g. 4.5" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Project / Job</label>
+                    <select id="tc-project" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg appearance-none">
+                        <option value="">Loading projects...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Subcontractor (Optional)</label>
+                    <select id="tc-sub" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg appearance-none">
+                        <option value="">None (In-House)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Task Description</label>
+                    <textarea id="tc-desc" rows="3" placeholder="What did you work on?" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg"></textarea>
+                </div>
+            </div>
+            <div class="p-5 border-t border-slate-100 bg-white">
+                <button id="btn-submit-tc" onclick="submitTimecardUI()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform text-lg flex justify-center items-center">
+                    Submit Timecard
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="expense-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex-col justify-end">
+        <div class="bg-white w-full h-[90vh] rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-slide-up">
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                <h2 class="text-xl font-black text-slate-800">Add Expense</h2>
+                <button onclick="closeExpenseModal()" class="bg-slate-100 text-slate-500 p-2 rounded-full active:bg-slate-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date</label>
+                        <input type="date" id="exp-date" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Amount ($)</label>
+                        <input type="number" step="0.01" id="exp-amount" placeholder="0.00" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Category</label>
+                    <select id="exp-category" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg appearance-none">
+                        <option value="Materials">Materials & Parts</option>
+                        <option value="Fuel">Fuel / Gas</option>
+                        <option value="Tools">Tooling</option>
+                        <option value="Meals">Meals / Per Diem</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Project / Job</label>
+                    <select id="exp-project" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg appearance-none">
+                        <option value="">Loading projects...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Receipt Photo</label>
+                    <div class="relative w-full bg-rose-50 border-2 border-dashed border-rose-200 rounded-xl p-4 text-center">
+                        <input type="file" id="exp-receipt" accept="image/*,application/pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <svg class="w-8 h-8 text-rose-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span class="text-rose-700 font-bold text-sm" id="receipt-label">Tap to upload receipt</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Notes</label>
+                    <textarea id="exp-desc" rows="2" placeholder="Where/Why?" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg"></textarea>
+                </div>
+            </div>
+            <div class="p-5 border-t border-slate-100 bg-white">
+                <button id="btn-submit-exp" onclick="submitExpenseUI()" class="w-full bg-rose-600 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform text-lg flex justify-center items-center">
+                    Submit Expense
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
 </body>
 </html>
+// ==========================================
+// SUPABASE INITIALIZATION
+// ==========================================
+const supabaseUrl = 'https://otmwvymcerqaqalipmqs.supabase.co';
+const supabaseKey = 'sb_publishable_UtoKnZAPU9gDxD7kCGvk_A_OhKMj1ft';
+const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+const COMPANY_ID = 'altair-001';
+
+// ==========================================
+// GLOBAL STATE
+// ==========================================
+window.globalPriceBook = [];
+window.globalCustomerDirectory = [];
+window.globalTechnicians = [];
+
+// ==========================================
+// TECHNICIAN SESSION
+// ==========================================
+window.getCurrentTechnicianId = function() {
+    return localStorage.getItem('altair_current_technician_id') || '';
+};
+
+window.setCurrentTechnicianView = function(techId) {
+    if (techId) localStorage.setItem('altair_current_technician_id', techId);
+    else localStorage.removeItem('altair_current_technician_id');
+    updateTechnicianViewLabel();
+    fetchLiveAppEngineData();
+    if (techId && typeof switchTab === 'function') switchTab('dispatch');
+};
+
+window.getTechnicianName = function(techId) {
+    if (!techId) return 'Unassigned';
+    const tech = window.globalTechnicians.find(t => t.id === techId);
+    return tech ? tech.name : 'Unknown';
+};
+
+function updateTechnicianViewLabel() {
+    const label = document.getElementById('tech-view-label');
+    if (!label) return;
+    const techId = window.getCurrentTechnicianId();
+    label.textContent = techId ? window.getTechnicianName(techId) : 'Dispatcher (All Jobs)';
+}
+
+window.fetchTechnicians = async function() {
+    const { data, error } = await db
+        .from('technicians')
+        .select('id, first_name, last_name, phone, active')
+        .eq('company_id', COMPANY_ID)
+        .eq('active', true)
+        .order('last_name', { ascending: true });
+
+    if (error) {
+        console.error('Technicians sync error:', error.message);
+        return;
+    }
+
+    window.globalTechnicians = (data || []).map(t => ({
+        id: t.id,
+        name: `${t.first_name} ${t.last_name}`,
+        phone: t.phone || ''
+    }));
+
+    populateTechnicianSelects();
+    updateTechnicianViewLabel();
+};
+
+function populateTechnicianSelects() {
+    const viewSelect = document.getElementById('tech-view-select');
+    const jobSelect = document.getElementById('job-tech-select');
+
+    let viewOptions = '<option value="">Dispatcher (All Jobs)</option>';
+    let jobOptions = '<option value="">Unassigned</option>';
+
+    window.globalTechnicians.forEach(tech => {
+        viewOptions += `<option value="${tech.id}">${tech.name}</option>`;
+        jobOptions += `<option value="${tech.id}">${tech.name}</option>`;
+    });
+
+    if (viewSelect) {
+        const saved = window.getCurrentTechnicianId();
+        viewSelect.innerHTML = viewOptions;
+        viewSelect.value = saved;
+    }
+
+    if (jobSelect) jobSelect.innerHTML = jobOptions;
+}
+
+// ==========================================
+// CLIENT DIRECTORY ENGINE
+// ==========================================
+window.fetchDirectoryData = async function() {
+    document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Syncing with Supabase...</p>';
+
+    const { data: customers, error } = await db
+        .from('customers')
+        .select('*')
+        .eq('company_id', COMPANY_ID)
+        .order('last_name', { ascending: true });
+
+    if (error) { console.error("DB Error:", error); return; }
+
+    window.globalCustomerDirectory = customers.map(c => ({
+        id: c.id,
+        name: `${c.first_name} ${c.last_name}`,
+        phone: c.phone || 'No Phone',
+        address: c.address || 'No Address'
+    }));
+
+    document.getElementById('directory-feed').innerHTML = '<p class="text-slate-400 text-center py-8">Type 2 or more characters to search your client database...</p>';
+};
+
+window.submitCustomer = async function() {
+    const first = document.getElementById('cust-first').value;
+    const last = document.getElementById('cust-last').value;
+    const phone = document.getElementById('cust-phone').value;
+    const email = document.getElementById('cust-email').value;
+    const address = document.getElementById('cust-address').value;
+    const btn = document.getElementById('btn-submit-cust');
+
+    if(!first || !last) { alert("First and Last name are required."); return; }
+
+    btn.innerText = "Syncing with Supabase...";
+    btn.classList.replace('bg-blue-600', 'bg-slate-400');
+    btn.classList.add('cursor-not-allowed');
+
+    const { error } = await db.from('customers').insert([{
+        company_id: COMPANY_ID, first_name: first, last_name: last, phone: phone, email: email, address: address
+    }]);
+
+    if (error) {
+        alert("Database Error: " + error.message);
+        btn.innerText = "Save Customer Profile";
+        btn.classList.replace('bg-slate-400', 'bg-blue-600');
+        btn.classList.remove('cursor-not-allowed');
+    } else {
+        btn.innerText = "Profile Created!";
+        btn.classList.replace('bg-slate-400', 'bg-green-500');
+        fetchDirectoryData();
+        setTimeout(closeCustomerModal, 1500);
+    }
+};
+
+// ==========================================
+// DISPATCH ENGINE
+// ==========================================
+window.fetchLiveAppEngineData = async function() {
+    const { data: activeJobs, error } = await db.from('jobs').select('*').eq('company_id', COMPANY_ID).neq('status', 'Completed');
+    if (error) return;
+
+    const currentTechId = window.getCurrentTechnicianId();
+    const visibleJobs = currentTechId
+        ? activeJobs.filter(job => job.assigned_technician_id === currentTechId)
+        : activeJobs;
+
+    const jobsElem = document.getElementById('kpi-active-jobs');
+    if(jobsElem) jobsElem.innerText = visibleJobs.length;
+
+    const feedElem = document.getElementById('dispatch-feed');
+    if(!feedElem) return;
+
+    const dispatchTitle = document.getElementById('dispatch-board-title');
+    if (dispatchTitle) {
+        dispatchTitle.textContent = currentTechId
+            ? `My Assigned Jobs`
+            : 'Live Dispatch Board';
+    }
+
+    if (visibleJobs.length === 0) {
+        const emptyMsg = currentTechId
+            ? 'No jobs assigned to you yet. Check back after dispatch assigns a ticket.'
+            : 'No active jobs on the board.';
+        feedElem.innerHTML = `<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">${emptyMsg}</div>`;
+        return;
+    }
+
+    let feedHTML = '';
+    visibleJobs.forEach(job => {
+        const techBadge = job.assigned_technician_id
+            ? `<span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-full">${window.getTechnicianName(job.assigned_technician_id)}</span>`
+            : `<span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-full">Unassigned</span>`;
+
+        feedHTML += `
+        <div onclick="openJobModal('${job.id}', '${job.name.replace(/'/g, "\\'")}', '${job.status}', '${job.assigned_technician_id || ''}')" class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:border-cyan-400 transition group cursor-pointer border-l-4 border-l-blue-500">
+            <div class="flex justify-between items-start mb-3 gap-2">
+                <h3 class="font-bold text-slate-800 text-lg sm:text-xl">${job.name}</h3>
+                <div class="flex flex-col items-end gap-1">
+                    <span class="bg-slate-100 text-slate-600 text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">${job.status}</span>
+                    ${techBadge}
+                </div>
+            </div>
+            <div class="text-xs sm:text-sm text-slate-500 space-y-2">
+                <p class="truncate">📍 ${job.address}</p>
+                <p>📞 ${job.phone}</p>
+                <p class="mt-2 text-blue-600 font-semibold">🔧 ${job.type}</p>
+            </div>
+        </div>`;
+    });
+    feedElem.innerHTML = feedHTML;
+};
+
+window.submitJobAction = async function() {
+    const jobId = document.getElementById('job-action-row').value;
+    const status = document.getElementById('job-status-select').value;
+    let assignedTechId = document.getElementById('job-tech-select').value || null;
+    if (window.getCurrentTechnicianId()) assignedTechId = window.getCurrentTechnicianId();
+    const btn = document.getElementById('btn-save-job');
+
+    btn.innerText = "Updating Database...";
+    btn.classList.add('cursor-not-allowed', 'opacity-70');
+
+    if (status === 'Completed') {
+        const hours = parseFloat(document.getElementById('closeout-hours').value) || 0;
+        let partsUsed = [];
+        document.querySelectorAll('.closeout-part-item').forEach(row => {
+            const name = row.querySelector('.part-name').value;
+            const qty = parseInt(row.querySelector('.part-qty').value) || 0;
+            if (name && qty > 0) partsUsed.push({ name, qty });
+        });
+
+        const { error } = await db.from('jobs').update({
+            status: 'Completed',
+            closed_at: new Date(),
+            assigned_technician_id: assignedTechId
+        }).eq('id', jobId);
+        if(error) { alert("Error: " + error.message); return; }
+
+        btn.innerHTML = `Generating Invoice & Syncing Inventory...`;
+        btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-sm sm:text-lg flex justify-center items-center";
+
+        await generateLiveInvoice(jobId, hours, partsUsed);
+
+        btn.innerHTML = `
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            Job Closed Successfully
+        `;
+        btn.classList.replace('bg-emerald-500', 'bg-green-600');
+
+        setTimeout(() => {
+            closeJobModal();
+            fetchLiveAppEngineData();
+        }, 1500);
+    } else {
+        const { error } = await db.from('jobs').update({
+            status: status,
+            assigned_technician_id: assignedTechId
+        }).eq('id', jobId);
+        if(error) { alert("Error: " + error.message); return; }
+        btn.innerHTML = `Status Updated!`;
+        btn.className = "w-full bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition mt-4 text-lg";
+        setTimeout(() => { closeJobModal(); fetchLiveAppEngineData(); }, 1500);
+    }
+};
+
+async function generateLiveInvoice(jobId, hours, partsUsed) {
+    const { data: jobData } = await db.from('jobs').select('*').eq('id', jobId).single();
+    if (!jobData) return;
+
+    let dynamicLineItems = [
+        [
+            { text: 'Description', style: 'tableHeader' },
+            { text: 'Qty', style: 'tableHeader', alignment: 'center' },
+            { text: 'Price', style: 'tableHeader', alignment: 'right' },
+            { text: 'Total', style: 'tableHeader', alignment: 'right' }
+        ]
+    ];
+
+    let grandTotal = 0;
+
+    if (hours > 0) {
+        const laborRate = 120.00;
+        const laborTotal = hours * laborRate;
+        grandTotal += laborTotal;
+
+        dynamicLineItems.push([
+            'Labor (Hours)',
+            { text: hours.toString(), alignment: 'center' },
+            { text: `$${laborRate.toFixed(2)}`, alignment: 'right' },
+            { text: `$${laborTotal.toFixed(2)}`, alignment: 'right' }
+        ]);
+    }
+
+    partsUsed.forEach(part => {
+        const pbItem = window.globalPriceBook.find(item => item.name.toLowerCase() === part.name.toLowerCase());
+        const price = pbItem ? pbItem.price : 0.00;
+        const lineTotal = part.qty * price;
+        grandTotal += lineTotal;
+
+        dynamicLineItems.push([
+            part.name,
+            { text: part.qty.toString(), alignment: 'center' },
+            { text: `$${price.toFixed(2)}`, alignment: 'right' },
+            { text: `$${lineTotal.toFixed(2)}`, alignment: 'right' }
+        ]);
+    });
+
+    const { error: invoiceError } = await db.from('invoices').insert([{
+        company_id: COMPANY_ID,
+        job_id: jobId,
+        amount: grandTotal,
+        status: 'Unpaid'
+    }]);
+
+    if (invoiceError) console.error("Invoice Save Error:", invoiceError.message);
+
+    if (partsUsed.length > 0) {
+        for (const part of partsUsed) {
+            const { data: currentItem } = await db
+                .from('inventory')
+                .select('id, stock_qty')
+                .eq('company_id', COMPANY_ID)
+                .ilike('part_name', part.name)
+                .single();
+
+            if (currentItem) {
+                const newQty = currentItem.stock_qty - part.qty;
+                await db.from('inventory').update({ stock_qty: newQty }).eq('id', currentItem.id);
+            }
+        }
+    }
+
+    const docDefinition = {
+        content: [
+            {
+                columns: [
+                    { text: 'ALTAIR\nClimate Control', style: 'brandLogo' },
+                    { text: `INVOICE\n# INV-${jobId.substring(0,6).toUpperCase()}`, style: 'invoiceTitle', alignment: 'right' }
+                ]
+            },
+            { canvas: [{ type: 'line', x1: 0, y1: 10, x2: 515, y2: 10, lineWidth: 2, lineColor: '#0ea5e9' }], margin: [0, 0, 0, 20] },
+            {
+                columns: [
+                    { text: [{ text: 'From:\n', bold: true, color: '#64748b' }, 'ALTAIR Climate Control\nLayton, UT'] },
+                    { text: [{ text: 'Bill To:\n', bold: true, color: '#64748b' }, `${jobData.name}\n${jobData.address}\n${jobData.phone}`], alignment: 'right' }
+                ],
+                margin: [0, 0, 0, 30]
+            },
+            {
+                style: 'invoiceTable',
+                table: { headerRows: 1, widths: ['*', 'auto', 'auto', 'auto'], body: dynamicLineItems },
+                layout: 'lightHorizontalLines'
+            },
+            {
+                columns: [
+                    { text: 'Thank you for choosing ALTAIR!', color: '#64748b', italics: true, margin: [0, 20, 0, 0] },
+                    { table: { widths: ['*', 'auto'], body: [['Total Due:', { text: `$${grandTotal.toFixed(2)}`, bold: true, fontSize: 16 }]] }, layout: 'noBorders', alignment: 'right', margin: [0, 20, 0, 0] }
+                ]
+            }
+        ],
+        styles: {
+            brandLogo: { fontSize: 22, bold: true, color: '#1e293b' },
+            invoiceTitle: { fontSize: 18, bold: true, color: '#0ea5e9' },
+            tableHeader: { bold: true, fontSize: 12, color: '#ffffff', fillColor: '#1e293b', margin: [0, 5, 0, 5] },
+            invoiceTable: { margin: [0, 5, 0, 15] }
+        },
+        defaultStyle: { columnGap: 20 }
+    };
+
+    pdfMake.createPdf(docDefinition).open();
+}
+
+// ==========================================
+// CLIENT PROFILE ENGINE
+// ==========================================
+window.showProfile = async function(custID) {
+    const m = document.getElementById('client-profile-modal');
+    m.style.display = 'flex';
+    const historyFeed = document.getElementById('profile-history-feed');
+    const header = document.getElementById('profile-header');
+
+    const cust = window.globalCustomerDirectory.find(c => c.id === custID);
+    if (!cust) return;
+
+    header.innerHTML = `
+        <div class="flex flex-col sm:flex-row justify-between sm:items-start">
+            <div class="mb-2 sm:mb-0">
+                <h2 class="text-2xl font-black text-slate-800">${cust.name}</h2>
+                <p class="text-slate-500 text-sm mt-1">${cust.address}</p>
+            </div>
+            <div class="sm:text-right">
+                <span class="inline-block bg-blue-50 border border-blue-100 text-blue-700 font-bold px-3 py-1 rounded-full text-sm shadow-sm">${cust.phone}</span>
+            </div>
+        </div>
+    `;
+
+    historyFeed.innerHTML = '<p class="text-slate-400 text-center py-8">Retrieving service history...</p>';
+
+    const { data: historyData, error } = await db
+        .from('jobs')
+        .select(`
+            id, type, status, created_at,
+            invoices ( amount, status, id )
+        `)
+        .eq('company_id', COMPANY_ID)
+        .eq('name', cust.name)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        historyFeed.innerHTML = `<p class="text-red-500 text-center py-4">Error fetching history: ${error.message}</p>`;
+        return;
+    }
+
+    if (!historyData || historyData.length === 0) {
+        historyFeed.innerHTML = '<div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center"><p class="text-slate-500 font-medium">No previous service history found.</p></div>';
+        return;
+    }
+
+    let html = '';
+    historyData.forEach(job => {
+        const dateStr = new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const isCompleted = job.status === 'Completed';
+
+        const statusIcon = isCompleted
+            ? `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
+            : `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+        let billingInfo = '';
+        if (job.invoices && job.invoices.length > 0) {
+            const inv = Array.isArray(job.invoices) ? job.invoices[0] : job.invoices;
+            const invColor = inv.status === 'Paid' ? 'text-green-600' : 'text-yellow-600';
+            billingInfo = `
+                <div class="mt-3 pt-3 border-t border-slate-100 flex justify-between items-center text-sm">
+                    <span class="text-slate-500">Invoice #${inv.id.substring(0,6).toUpperCase()}</span>
+                    <span class="font-bold ${invColor}">$${parseFloat(inv.amount).toFixed(2)} (${inv.status})</span>
+                </div>
+            `;
+        }
+
+        html += `
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-3 hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center space-x-3">
+                    ${statusIcon}
+                    <div>
+                        <h4 class="font-bold text-slate-800">${job.type || 'Service Call'}</h4>
+                        <p class="text-xs text-slate-400">${dateStr}</p>
+                    </div>
+                </div>
+                <span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">${job.status}</span>
+            </div>
+            ${billingInfo}
+        </div>`;
+    });
+
+    historyFeed.innerHTML = html;
+};
+
+// ==========================================
+// ESTIMATE ENGINE
+// ==========================================
+window.fetchPriceBook = async function() {
+    const { data, error } = await db.from('price_book').select('*').eq('company_id', COMPANY_ID);
+    if (!error) window.globalPriceBook = data;
+};
+
+window.submitEstimate = async function() {
+    const select = document.getElementById('est-customer-select');
+    if(select.selectedIndex <= 0) { alert("Please select a customer."); return; }
+
+    const custID = select.options[select.selectedIndex].value;
+    const amount = document.getElementById('est-total-display').innerText;
+    const btn = document.getElementById('btn-submit-est');
+
+    if(parseFloat(amount) === 0) { alert("Add at least one priced item."); return; }
+
+    btn.innerText = "Saving to Database...";
+    btn.classList.replace('bg-cyan-500', 'bg-slate-400');
+    btn.classList.add('cursor-not-allowed');
+
+    let lineItems = [];
+    document.querySelectorAll('.line-item').forEach(row => {
+        const nameElem = row.querySelector('.item-name');
+        const name = nameElem.options[nameElem.selectedIndex].text;
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        if (name && qty > 0) lineItems.push({ name, qty, price });
+    });
+
+    const { error: estError } = await db.from('estimates').insert([{
+        company_id: COMPANY_ID, customer_id: custID, title: 'Service Estimate', amount: amount, line_items: lineItems
+    }]);
+
+    if (estError) {
+        alert("Error: " + estError.message);
+        btn.innerText = "Save to Dispatch Board";
+        btn.classList.replace('bg-slate-400', 'bg-cyan-500');
+        btn.classList.remove('cursor-not-allowed');
+        return;
+    }
+
+    const customer = window.globalCustomerDirectory.find(c => c.id === custID);
+
+    if (customer) {
+        const { error: jobError } = await db.from('jobs').insert([{
+            company_id: COMPANY_ID,
+            name: customer.name,
+            phone: customer.phone,
+            address: customer.address,
+            type: 'Estimate / Proposal',
+            status: 'Scheduled'
+        }]);
+
+        if (jobError) console.error("Failed to create dispatch ticket:", jobError.message);
+    }
+
+    btn.innerText = "Estimate Saved & Dispatched!";
+    btn.classList.replace('bg-slate-400', 'bg-green-500');
+    fetchLiveAppEngineData();
+    setTimeout(closeEstimateModal, 1500);
+};
+
+// ==========================================
+// INVOICE & BILLING ENGINE
+// ==========================================
+window.fetchInvoicesData = async function() {
+    const feed = document.getElementById('invoices-feed');
+    feed.innerHTML = '<p class="text-slate-400 italic text-center py-8">Syncing billing records...</p>';
+
+    const { data: invoices, error } = await db
+        .from('invoices')
+        .select(`
+            id, amount, status, created_at,
+            jobs ( name )
+        `)
+        .eq('company_id', COMPANY_ID)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Billing Sync Error:", error);
+        feed.innerHTML = `<p class="text-red-500 text-center py-8">Connection error. Check console.</p>`;
+        return;
+    }
+
+    let unpaidTotal = 0;
+    let paidTotal = 0;
+    let html = '';
+
+    if (!invoices || invoices.length === 0) {
+        html = '<div class="bg-white border border-slate-200 p-8 rounded-xl text-center text-slate-500 font-medium shadow-sm">No invoices generated yet. Close out a job to create one!</div>';
+    } else {
+        invoices.forEach(inv => {
+            const amount = parseFloat(inv.amount) || 0;
+
+            let jobName = 'Service Call';
+            if (inv.jobs && !Array.isArray(inv.jobs)) jobName = inv.jobs.name;
+            else if (Array.isArray(inv.jobs) && inv.jobs.length > 0) jobName = inv.jobs[0].name;
+
+            const dateStr = new Date(inv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            if (inv.status === 'Unpaid') unpaidTotal += amount;
+            if (inv.status === 'Paid') paidTotal += amount;
+
+            const isPaid = inv.status === 'Paid';
+            const statusColor = isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
+            const borderLeft = isPaid ? 'border-l-green-500' : 'border-l-yellow-400';
+
+            const actionBtn = isPaid
+                ? `<span class="text-xs font-bold text-slate-400 flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Paid</span>`
+                : `<button onclick="markAsPaid('${inv.id}')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition whitespace-nowrap">Mark Paid</button>`;
+
+            html += `
+            <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm mb-3 border-l-4 ${borderLeft} flex flex-col sm:flex-row justify-between sm:items-center transition hover:shadow-md">
+                <div class="mb-3 sm:mb-0">
+                    <h3 class="font-bold text-slate-800 text-lg">${jobName}</h3>
+                    <p class="text-sm text-slate-500 mt-1 font-mono text-xs">INV-${inv.id.substring(0,6).toUpperCase()} • ${dateStr}</p>
+                    <span class="inline-block mt-2 ${statusColor} text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded">${inv.status}</span>
+                </div>
+                <div class="sm:text-right flex flex-row sm:flex-col items-center sm:items-end justify-between sm:h-full">
+                    <span class="text-2xl font-black text-slate-800 sm:mb-2">$${amount.toFixed(2)}</span>
+                    ${actionBtn}
+                </div>
+            </div>`;
+        });
+    }
+
+    document.getElementById('kpi-unpaid').innerText = `$${unpaidTotal.toFixed(2)}`;
+    document.getElementById('kpi-paid').innerText = `$${paidTotal.toFixed(2)}`;
+    feed.innerHTML = html;
+};
+
+window.markAsPaid = async function(invoiceId) {
+    const { error } = await db.from('invoices').update({ status: 'Paid' }).eq('id', invoiceId);
+    if (error) { alert("Error updating billing: " + error.message); return; }
+    fetchInvoicesData();
+};
+
+// ==========================================
+// SUBCONTRACTOR & PROJECT REFERENCE DATA
+// ==========================================
+
+window.getActiveSubcontractors = async function() {
+    const { data, error } = await db
+        .from('subcontractors')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name', { ascending: true });
+        
+    if (error) {
+        console.error('Error fetching subcontractors:', error.message);
+        return [];
+    }
+    return data;
+};
+
+window.getActiveProjects = async function() {
+    const { data, error } = await db
+        .from('projects')
+        .select('id, name')
+        .eq('status', 'in_progress')
+        .order('name', { ascending: true });
+        
+    if (error) {
+        console.error('Error fetching projects:', error.message);
+        return [];
+    }
+    return data;
+};
+
+// ==========================================
+// TIMECARDS ENGINE
+// ==========================================
+
+window.submitTimecard = async function(timecardData) {
+    // timecardData expects: { user_id, project_id, subcontractor_id, work_date, hours_worked, task_description }
+    const { data, error } = await db
+        .from('timecards')
+        .insert([timecardData])
+        .select();
+        
+    if (error) {
+        console.error('Error submitting timecard:', error.message);
+        throw error;
+    }
+    return data;
+};
+
+// ==========================================
+// EXPENSES & RECEIPTS ENGINE
+// ==========================================
+
+window.uploadReceiptFile = async function(userId, file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+
+    const { data, error } = await db.storage
+        .from('receipts') 
+        .upload(filePath, file);
+
+    if (error) {
+        console.error('Error uploading receipt:', error.message);
+        throw error;
+    }
+    return data.path; 
+};
+
+window.submitExpense = async function(expenseData) {
+    // expenseData expects: { user_id, project_id, subcontractor_id, amount, category, expense_date, receipt_path, description }
+    const { data, error } = await db
+        .from('expenses')
+        .insert([expenseData])
+        .select();
+        
+    if (error) {
+        console.error('Error submitting expense:', error.message);
+        throw error;
+    }
+    return data;
+};
+
+// ==========================================
+// TIMECARDS & EXPENSES UI ENGINE
+// ==========================================
+
+// --- Modal Controls ---
+window.openTimecardModal = async function() {
+    document.getElementById('timecard-modal').style.display = 'flex';
+    document.getElementById('tc-date').valueAsDate = new Date(); // Default to today
+    await populateDropdowns('tc-project', 'tc-sub');
+};
+
+window.closeTimecardModal = function() {
+    document.getElementById('timecard-modal').style.display = 'none';
+};
+
+window.openExpenseModal = async function() {
+    document.getElementById('expense-modal').style.display = 'flex';
+    document.getElementById('exp-date').valueAsDate = new Date(); // Default to today
+    await populateDropdowns('exp-project', 'exp-sub');
+};
+
+window.closeExpenseModal = function() {
+    document.getElementById('expense-modal').style.display = 'none';
+};
+
+// Update file label when a receipt is selected
+document.getElementById('exp-receipt')?.addEventListener('change', function(e) {
+    const label = document.getElementById('receipt-label');
+    if (this.files && this.files[0]) {
+        label.innerText = this.files[0].name;
+    } else {
+        label.innerText = 'Tap to upload receipt';
+    }
+});
+
+// --- Populate Dropdowns ---
+async function populateDropdowns(projectSelectId, subSelectId) {
+    const projSelect = document.getElementById(projectSelectId);
+    const subSelect = document.getElementById(subSelectId);
+
+    // Fetch from the API functions we built
+    const projects = await window.getActiveProjects();
+    const subs = await window.getActiveSubcontractors();
+
+    projSelect.innerHTML = '<option value="">Select a Project...</option>';
+    projects.forEach(p => {
+        projSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+
+    subSelect.innerHTML = '<option value="">None (In-House)</option>';
+    subs.forEach(s => {
+        subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+    });
+}
+
+// --- Submit Actions ---
+window.submitTimecardUI = async function() {
+    const btn = document.getElementById('btn-submit-tc');
+    const hours = parseFloat(document.getElementById('tc-hours').value);
+    
+    if (!hours || hours <= 0) {
+        alert("Please enter valid hours.");
+        return;
+    }
+
+    // Get current tech ID (from your existing auth logic)
+    const currentTechId = window.getCurrentTechnicianId() || (await db.auth.getUser()).data.user?.id;
+    if (!currentTechId) { alert("Error: User not authenticated."); return; }
+
+    btn.innerText = "Submitting...";
+    btn.classList.replace('bg-indigo-600', 'bg-slate-400');
+    btn.classList.add('cursor-not-allowed');
+
+    try {
+        await window.submitTimecard({
+            user_id: currentTechId,
+            project_id: document.getElementById('tc-project').value || null,
+            subcontractor_id: document.getElementById('tc-sub').value || null,
+            work_date: document.getElementById('tc-date').value,
+            hours_worked: hours,
+            task_description: document.getElementById('tc-desc').value
+        });
+
+        // Visible Confirmation Rule Triggered
+        btn.innerHTML = `<svg class="w-6 h-6 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Time Saved!`;
+        btn.classList.replace('bg-slate-400', 'bg-green-500');
+        
+        setTimeout(() => {
+            closeTimecardModal();
+            // Reset button state
+            btn.innerText = "Submit Timecard";
+            btn.classList.replace('bg-green-500', 'bg-indigo-600');
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('tc-hours').value = '';
+            document.getElementById('tc-desc').value = '';
+        }, 1500);
+
+    } catch (error) {
+        alert("Submission failed: " + error.message);
+        btn.innerText = "Submit Timecard";
+        btn.classList.replace('bg-slate-400', 'bg-indigo-600');
+        btn.classList.remove('cursor-not-allowed');
+    }
+};
+
+window.submitExpenseUI = async function() {
+    const btn = document.getElementById('btn-submit-exp');
+    const amount = parseFloat(document.getElementById('exp-amount').value);
+    const fileInput = document.getElementById('exp-receipt');
+    
+    if (!amount || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    const currentTechId = window.getCurrentTechnicianId() || (await db.auth.getUser()).data.user?.id;
+    if (!currentTechId) { alert("Error: User not authenticated."); return; }
+
+    btn.innerText = "Uploading & Saving...";
+    btn.classList.replace('bg-rose-600', 'bg-slate-400');
+    btn.classList.add('cursor-not-allowed');
+
+    try {
+        let receiptPath = null;
+        
+        // Handle file upload if a receipt was attached
+        if (fileInput.files && fileInput.files[0]) {
+            receiptPath = await window.uploadReceiptFile(currentTechId, fileInput.files[0]);
+        }
+
+        await window.submitExpense({
+            user_id: currentTechId,
+            project_id: document.getElementById('exp-project').value || null,
+            subcontractor_id: document.getElementById('exp-sub').value || null,
+            expense_date: document.getElementById('exp-date').value,
+            amount: amount,
+            category: document.getElementById('exp-category').value,
+            receipt_path: receiptPath,
+            description: document.getElementById('exp-desc').value
+        });
+
+        // Visible Confirmation Rule Triggered
+        btn.innerHTML = `<svg class="w-6 h-6 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Expense Saved!`;
+        btn.classList.replace('bg-slate-400', 'bg-green-500');
+        
+        setTimeout(() => {
+            closeExpenseModal();
+            // Reset state
+            btn.innerText = "Submit Expense";
+            btn.classList.replace('bg-green-500', 'bg-rose-600');
+            btn.classList.remove('cursor-not-allowed');
+            document.getElementById('exp-amount').value = '';
+            document.getElementById('exp-desc').value = '';
+            fileInput.value = '';
+            document.getElementById('receipt-label').innerText = 'Tap to upload receipt';
+        }, 1500);
+
+    } catch (error) {
+        alert("Submission failed: " + error.message);
+        btn.innerText = "Submit Expense";
+        btn.classList.replace('bg-slate-400', 'bg-rose-600');
+        btn.classList.remove('cursor-not-allowed');
+    }
+};
+
+// ==========================================
+// FIELD TECH SHIFT ENGINE
+// ==========================================
+
+window.clockIn = async function(userId) {
+    const { data, error } = await db
+        .from('shifts')
+        .insert([{ user_id: userId, status: 'active' }])
+        .select()
+        .single();
+        
+    if (error) {
+        console.error('Error clocking in:', error.message);
+        throw error;
+    }
+    return data;
+};
+
+window.clockOut = async function(shiftId) {
+    const { data, error } = await db
+        .from('shifts')
+        .update({ clock_out: new Date().toISOString(), status: 'completed' })
+        .eq('id', shiftId)
+        .select()
+        .single();
+        
+    if (error) {
+        console.error('Error clocking out:', error.message);
+        throw error;
+    }
+    return data;
+};
+
+window.getTechAssignedJobs = async function(techId) {
+    // Fetches active jobs assigned to this specific user, ordered by creation date
+    const { data, error } = await db
+        .from('jobs')
+        .select('*')
+        .eq('assigned_technician_id', techId)
+        .neq('status', 'Completed')
+        .order('created_at', { ascending: true });
+        
+    if (error) {
+        console.error('Error fetching assigned jobs:', error.message);
+        return [];
+    }
+    return data;
+};
+
+// ==========================================
+// FIELD TECH DASHBOARD ENGINE
+// ==========================================
+
+let currentActiveShiftId = null;
+let currentNextJobAddress = null;
+
+window.toggleShiftStatus = async function() {
+    const btn = document.getElementById('btn-clock-toggle');
+    const statusText = document.getElementById('shift-status-text');
+    const icon = document.getElementById('shift-icon');
+    
+    const currentTechId = window.getCurrentTechnicianId() || 'DEV_USER_ID'; 
+
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    try {
+        if (!currentActiveShiftId) {
+            // Clock In
+            const shift = await window.clockIn(currentTechId);
+            currentActiveShiftId = shift.id;
+            
+            statusText.innerText = "On Duty";
+            statusText.classList.replace('text-slate-800', 'text-emerald-600');
+            btn.classList.replace('bg-slate-100', 'bg-emerald-500');
+            btn.classList.replace('border-slate-200', 'border-emerald-600');
+            icon.classList.replace('text-slate-400', 'text-white');
+            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>`; 
+        } else {
+            // Clock Out
+            await window.clockOut(currentActiveShiftId);
+            currentActiveShiftId = null;
+            
+            statusText.innerText = "Off Duty";
+            statusText.classList.replace('text-emerald-600', 'text-slate-800');
+            btn.classList.replace('bg-emerald-500', 'bg-slate-100');
+            btn.classList.replace('border-emerald-600', 'border-slate-200');
+            icon.classList.replace('text-white', 'text-slate-400');
+            icon.innerHTML = `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>`; 
+        }
+    } catch (error) {
+        alert("Failed to update shift: " + error.message);
+    } finally {
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+};
+
+window.renderTechDashboard = async function() {
+    const techId = window.getCurrentTechnicianId();
+    if (!techId) return;
+
+    const jobs = await window.getTechAssignedJobs(techId);
+    const feed = document.getElementById('pending-tasks-feed');
+    const currentTaskCard = document.getElementById('current-task-card');
+    
+    if (!jobs || jobs.length === 0) {
+        currentTaskCard.style.display = 'none';
+        feed.innerHTML = `<div class="bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-8 text-center"><p class="text-slate-500 font-medium">Queue is empty.</p></div>`;
+        return;
+    }
+
+    currentTaskCard.style.display = 'block';
+    currentTaskCard.classList.remove('hidden');
+    
+    // Render Current Task (First Job in Queue)
+    const currentJob = jobs[0];
+    document.getElementById('ct-name').innerText = currentJob.name;
+    document.getElementById('ct-address').innerText = currentJob.address;
+    document.getElementById('ct-type').innerText = currentJob.type || 'Service Call';
+    currentNextJobAddress = currentJob.address; // Used for the map link
+
+    const badge = document.getElementById('ct-status-badge');
+    badge.innerText = currentJob.status;
+
+    // THE WORKFLOW LOGIC: Check status and render the correct button
+    const actionContainer = document.getElementById('ct-action-container');
+    
+    if (currentJob.status === 'En Route') {
+        // Step 2: Already driving -> Show Navigation Button
+        badge.className = 'bg-blue-100 text-blue-800 text-[10px] font-black uppercase px-2 py-1 rounded';
+        actionContainer.innerHTML = `
+            <button onclick="launchNavigation()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform flex justify-center items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                Navigate to Site
+            </button>
+        `;
+    } else {
+        // Step 1: Just dispatched -> Show "Mark En Route" Button
+        badge.className = 'bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2 py-1 rounded';
+        actionContainer.innerHTML = `
+            <button onclick="markJobEnRoute('${currentJob.id}')" class="w-full bg-slate-800 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform flex justify-center items-center">
+                Mark En Route
+            </button>
+        `;
+    }
+
+    // Render Pending Queue (Remaining Jobs)
+    let feedHTML = '';
+    const pendingJobs = jobs.slice(1);
+    
+    if (pendingJobs.length === 0) {
+        feedHTML = `<p class="text-sm text-slate-400 text-center py-2">No other pending tasks.</p>`;
+    } else {
+        pendingJobs.forEach((job) => {
+            feedHTML += `
+            <div class="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-sm mb-2">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm">${job.name}</h4>
+                    <p class="text-xs text-slate-500 truncate w-48">${job.address}</p>
+                </div>
+                <span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">${job.status}</span>
+            </div>`;
+        });
+    }
+    feed.innerHTML = feedHTML;
+};
+
+// Function to update status to 'En Route' and refresh UI
+window.markJobEnRoute = async function(jobId) {
+    const { error } = await db.from('jobs').update({ status: 'En Route' }).eq('id', jobId);
+    if (error) {
+        alert("Error updating status: " + error.message);
+        return;
+    }
+    // Re-render the dashboard to instantly swap the button
+    renderTechDashboard();
+};
+
+// Universal Link to Native Maps App
+window.launchNavigation = function() {
+    if (!currentNextJobAddress) return;
+    const encodedAddress = encodeURIComponent(currentNextJobAddress);
+    const googleMapsUrl = `http://maps.google.com/maps?daddr=${encodedAddress}`;
+    window.open(googleMapsUrl, '_blank');
+};
+
+// Auto-run when the tab/app loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Call this if the user is on the field tech view
+    if (document.getElementById('view-tech')) {
+        renderTechDashboard();
+    }
+});
